@@ -1,11 +1,9 @@
-#define F_CPU 4915200
-#define BAUD 9600
 /*For some reason using MYUBRR like this, does not work... */
 //#define MYUBRR ( (F_CPU) / (BAUD*16UL)) - 1
 #define MYUBRR 31
 #include <avr/io.h>
 #include <stdio.h>
-#include<util/delay.h>
+#include <util/delay.h>
 #include "uart.h"
 
 void UART_transmit(unsigned char data) {
