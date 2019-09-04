@@ -21,6 +21,7 @@ void XMEM_init(void) {
 	// We use PC7-PC4 for JTAG, NOT for XMEM address
 	SFIOR |= (1 << XMM2);
 	SFIOR &= ~((1 << XMM1) | (1 << XMM0));
+	printf("External memory enabled\n\n\r");
 }
 
 uint8_t XMEM_read(uint16_t address) {
@@ -39,7 +40,7 @@ void SRAM_test(void)
 	uint16_t ext_ram_size = 0x800;
 	uint16_t write_errors = 0;
 	uint16_t retrieval_errors = 0;
-	printf("Starting SRAM test...\n");
+	printf("Starting SRAM test...\n\r");
 	// rand() stores some internal state, so calling this function in a loop will
 	// yield different seeds each time (unless srand() is called before this function)
 	uint16_t seed = rand();
@@ -50,7 +51,7 @@ void SRAM_test(void)
 		ext_ram[i] = some_value;
 		uint8_t retreived_value = ext_ram[i];
 		if (retreived_value != some_value) {
-			printf("Write phase error: ext_ram[%4d] = %02X (should be %02X)\n", i,
+			printf("Write phase error: ext_ram[%4d] = %02X (should be %02X)\n\r", i,
 			retreived_value, some_value);
 			write_errors++;
 		}
@@ -61,10 +62,10 @@ void SRAM_test(void)
 		uint8_t some_value = rand();
 		uint8_t retreived_value = ext_ram[i];
 		if (retreived_value != some_value) {
-			printf("Retrieval phase error: ext_ram[%4d] = %02X (should be %02X)\n",
+			printf("Retrieval phase error: ext_ram[%4d] = %02X (should be %02X)\n\r",
 			i, retreived_value, some_value);
 			retrieval_errors++;
 		}
 	}
-	printf("SRAM test completed with \n%4d errors in write phase and \n%4d errors in retrieval phase\n\n", write_errors, retrieval_errors);
+	printf("SRAM test completed with \n%4d errors in write phase and \n%4d errors in retrieval phase\n\n\r", write_errors, retrieval_errors);
 }
