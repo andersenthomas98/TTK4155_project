@@ -21,7 +21,6 @@ void XMEM_init(void) {
 	// We use PC7-PC4 for JTAG, NOT for XMEM address
 	SFIOR |= (1 << XMM2);
 	SFIOR &= ~((1 << XMM1) | (1 << XMM0));
-	printf("External memory enabled\n\n\r");
 }
 
 uint8_t XMEM_read(uint16_t address) {
@@ -67,5 +66,5 @@ void SRAM_test(void)
 			retrieval_errors++;
 		}
 	}
-	printf("SRAM test completed with \n%4d errors in write phase and \n%4d errors in retrieval phase\n\n\r", write_errors, retrieval_errors);
+	printf("SRAM test completed with \n\r%4d errors in write phase and \n\r%4d errors in retrieval phase\n\n\r", write_errors, retrieval_errors);
 }

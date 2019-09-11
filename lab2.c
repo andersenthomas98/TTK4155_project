@@ -7,6 +7,8 @@
 
 #include "Drivers/uart.h"
 #include "Drivers/xmem.h"
+#include "Drivers/interrupt.h"
+#include "Drivers/adc.h"
 #define F_CPU 4915200UL
 #include <avr/io.h>
 #include <util/delay.h>
@@ -14,27 +16,21 @@
 #define MYUBRR 31
 
 
-
 int main(void)
 {
-	
 	UART_init(MYUBRR);
-	/*
-		Read og write signaler til SRAM fra atmega går kun opp til litt over 1V når de egentlig skulle vært 5V.
-		(Noe galt med selve atmegaen??)
-	*/
-	/*
-	printf("Starting...\n\r");
-	DDRD |= (1 << PD7);
-	while (1) {
-		PORTD = (1 << PD7);
-		_delay_ms(500);
-		PORTD = (0 << PD7);
-		_delay_ms(500);
-	}*/
-	
 	XMEM_init();
-	SRAM_test();
+	INTERRUPT_init();
+	printf("Starting....\n\r");
+	
+	while(1) {
+		//printf("Interrupt ready: %d", ADC_INTERRUPT_READY);
+		int x = ADC_read_x();
+		int y = ADC_read_y();
+		printf("x = %d \n\r y = %d \n\r", x, y);
+		
+		_delay_ms(500);
+	}
 	
 	return 0;
 	
