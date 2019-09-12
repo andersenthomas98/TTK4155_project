@@ -11,17 +11,17 @@
 #include <avr/interrupt.h>
 
 
+
 uint8_t ADC_read_x(void) {
 	// Setup to read from channel 1
 	XMEM_write(0b0100, 0b010000000100);
 	while (!ADC_INTERRUPT_READY) {
 		// wait for interrupt from ADC
-		printf("waiting for interrupt\n\r");
+		//printf("waiting for interrupt\n\r");
 	}
 	ADC_INTERRUPT_READY = 0;
-	//printf("interrupt finished\n\r");
 	uint8_t x = XMEM_read(0b010000000000);
-	printf("XMEM_read = %02X\n\r", x);
+	//printf("read_x = %d \n\r", x);
 	return x;
 }
 
@@ -32,7 +32,9 @@ uint8_t ADC_read_y(void) {
 		// wait for interrupt from ADC
 	}
 	ADC_INTERRUPT_READY = 0;
-	return XMEM_read(0b010000000000);
+	uint8_t y = XMEM_read(0b010000000000);
+	//printf("read_y = %d \n\r", y);
+	return y;
 }
 
 uint8_t ADC_slider_left(void) {
@@ -59,12 +61,8 @@ uint8_t ADC_slider_right(void) {
 
 
 
-
 /*
-// TODO
-void ADC_init(void) {
-	
-}
+
 // TODO
 void ADC_calibrate(void) {
 	

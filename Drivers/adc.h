@@ -11,15 +11,6 @@
 #define ADC_H_
 
 
-typedef struct {
-	uint8_t x;
-	uint8_t y;
-} pos_t;
-
-typedef enum {
-	LEFT, RIGHT, UP, DOWN, NEUTRAL
-} dir_t;
-
 uint8_t ADC_read_x(void);
 
 uint8_t ADC_read_y(void);
