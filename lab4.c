@@ -11,6 +11,7 @@
 #include "Drivers/interrupt.h"
 #include "Drivers/adc.h"
 #include "Drivers/controls.h"
+#include "Drivers/menu.h"
 #define F_CPU 4915200
 #include <avr/io.h>
 #include <util/delay.h>
@@ -29,23 +30,68 @@ int main(void)
 	OLED_init();
 	
 	OLED_clearAll();
-	
-	
-	OLED_pos(0,0);
-	OLED_print_string("Hei axel!");
-	OLED_pos(1,40);
-	OLED_print_string("yoyoyo");
 
-	OLED_init_arr();
-	OLED_set_pixel(50,50);
-	OLED_set_pixel(51,51);
-	OLED_set_pixel(52,52);
-	OLED_set_pixel(53,53);
-	OLED_set_pixel(54,54);
-	OLED_set_pixel(55,55);
+	//MENU_init();	
 	OLED_refresh();
-	
-	
+
+	menu_t mainMenu;
+	menu_ptr mainMenuPtr = &mainMenu;
+	mainMenu.name = "Main menu";
+	mainMenu.num_children = 3;
+	mainMenu.selectedChild = 0;
+
+	menu_t sub_menu0;
+	menu_ptr sub_menu0Ptr = &sub_menu0;
+	sub_menu0.parent = mainMenuPtr;
+	sub_menu0.num_children = 0;
+	sub_menu0.name = "sub0";
+
+	menu_t sub_menu1;
+	menu_ptr sub_menu1Ptr = &sub_menu1;
+	sub_menu1.parent = mainMenuPtr;
+	sub_menu1.num_children = 3;
+	sub_menu1.name = "Morofunksjoner";
+
+	menu_t sub_menu2;
+	menu_ptr sub_menu2Ptr = &sub_menu2;
+	sub_menu2.parent = mainMenuPtr;
+	sub_menu2.num_children = 0;
+	sub_menu2.name = "sub2";
+
+	mainMenu.parent = NULL;
+	mainMenu.children[0] = sub_menu0Ptr;
+	mainMenu.children[1] = sub_menu1Ptr;
+	mainMenu.children[2] = sub_menu2Ptr;
+
+	menu_t sub_menu00;
+	menu_ptr sub_menu00Ptr = &sub_menu00;
+	sub_menu00.parent = sub_menu1Ptr;
+	sub_menu00.num_children = 0;
+	sub_menu00.name = "pong";
+	sub_menu00.fun_ptr = &MENU_pong;
+
+	menu_t sub_menu10;
+	menu_ptr sub_menu10Ptr = &sub_menu10;
+	sub_menu10.parent = sub_menu1Ptr;
+	sub_menu10.num_children = 0;
+	sub_menu10.name = "Thomas' CD";
+	sub_menu10.fun_ptr = &MENU_animation;
+
+	menu_t sub_menu20;
+	menu_ptr sub_menu20Ptr = &sub_menu20;
+	sub_menu20.parent = sub_menu1Ptr;
+	sub_menu20.num_children = 0;
+	sub_menu20.name = "Invers";
+	sub_menu20.fun_ptr = &MENU_veryFunInvertingFunction;
+
+
+	sub_menu1.children[0] = sub_menu00Ptr;
+	sub_menu1.children[1] = sub_menu10Ptr;
+	sub_menu1.children[2] = sub_menu20Ptr;
+
+	MENU_navigate(mainMenuPtr);
+		
+
 	while(1) {
 		
 		
