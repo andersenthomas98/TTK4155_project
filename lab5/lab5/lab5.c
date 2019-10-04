@@ -14,6 +14,9 @@
 #include "Drivers/controls.h"
 #include "Drivers/menu.h"
 #include "Drivers/timer.h"
+#include "Drivers/pong.h"
+#include "Drivers/spi.h"
+#include "Drivers/mcp2515.h"
 #define F_CPU 4915200
 #include <avr/io.h>
 #include <util/delay.h>
@@ -28,15 +31,17 @@ int main(void)
 	XMEM_init();
 	INTERRUPT_init();
 	btn_init();
-	printf("Starting....\n\r");
-	OLED_init();
+	printf("Starting.... \n\r");
 	timer_8bit256divisionCheckOnlyinit();
+	SPI_MasterInit();
+
 	
+	
+	OLED_init();
 	OLED_clearAll();
-
-	//MENU_init();
 	OLED_refresh();
-
+	
+	/*
 	menu_t mainMenu;
 	menu_ptr mainMenuPtr = &mainMenu;
 	mainMenu.name = "Main menu";
@@ -70,15 +75,15 @@ int main(void)
 	menu_ptr sub_menu00Ptr = &sub_menu00;
 	sub_menu00.parent = sub_menu1Ptr;
 	sub_menu00.num_children = 0;
-	sub_menu00.name = "pong";
-	sub_menu00.fun_ptr = &MENU_pong;
+	sub_menu00.name = "quick pong";
+	sub_menu00.fun_ptr = &pong_fast;
 
 	menu_t sub_menu10;
 	menu_ptr sub_menu10Ptr = &sub_menu10;
 	sub_menu10.parent = sub_menu1Ptr;
 	sub_menu10.num_children = 0;
-	sub_menu10.name = "Thomas' CD";
-	sub_menu10.fun_ptr = &MENU_animation;
+	sub_menu10.name = "slow pong";
+	sub_menu10.fun_ptr = &pong_slow;
 
 	menu_t sub_menu20;
 	menu_ptr sub_menu20Ptr = &sub_menu20;
@@ -93,12 +98,29 @@ int main(void)
 	sub_menu1.children[2] = sub_menu20Ptr;
 
 	MENU_navigate(mainMenuPtr);
+	*/
 	
 
+
 	while(1) {
+
+		// Testing SPI
+		/*
+		SPI_transmit(0x55);
+		_delay_ms(500);
+		*/
+		
+		// Testing CAN controller
+		MCP_write(MCP_RXF0SIDH, 171);
+		_delay_ms(10);
+		printf("MCP_read = %d\n\r", MCP_read(MCP_RXF0SIDH));
+		_delay_ms(10);
+		MCP_reset();
+		printf("MCP_read = %d\n\r", MCP_read(MCP_RXF0SIDH));
+		_delay_ms(500);
 		
 		
-	}
+	} 
 	
 	return 0;
 	

@@ -24,9 +24,9 @@ void INTERRUPT_init() {
 	MCUCR |= (1 << ISC10);	
 	*/
 	
-	// Enable interrupt on INT0 (ADC) and INT1 (MCU)
+	// Enable interrupt on INT0 (ADC) and INT1 (MCP)
 	GICR |= (1 << INT0);
-	GICR |= (1 << INT1); 
+//	GICR |= (1 << INT1); 
 }
 
 // Interrupt for ADC

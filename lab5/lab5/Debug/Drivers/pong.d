@@ -1,4 +1,4 @@
-Drivers/menu.d Drivers/menu.o: ../Drivers/menu.c ../Drivers/adc.h \
+Drivers/pong.d Drivers/pong.o: ../Drivers/pong.c ../Drivers/adc.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdint.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdint.h \
  ../Drivers/menu.h ../Drivers/oled.h ../Drivers/controls.h \

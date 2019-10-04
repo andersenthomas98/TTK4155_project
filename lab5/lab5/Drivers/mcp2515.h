@@ -8,6 +8,23 @@
 
 #ifndef MCP2515_H_
 #define MCP2515_H_
+#include <stdint.h>
+
+
+void MCP_init(void);
+
+void MCP_reset(void);
+
+uint8_t MCP_read(uint8_t address);
+
+void MCP_write(uint8_t address, uint8_t data);
+
+void MCP_requestToSend(void);
+
+void MCP_bitModify(uint8_t address, uint8_t mask, uint8_t data);
+
+uint8_t MCP_readStatus(void);
+
 
 /*
 mcp2515.h

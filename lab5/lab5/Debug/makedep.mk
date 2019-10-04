@@ -4,6 +4,8 @@
 
 Drivers\adc.c
 
+Drivers\pong.c
+
 Drivers\controls.c
 
 Drivers\interrupt.c

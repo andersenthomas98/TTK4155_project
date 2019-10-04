@@ -11,7 +11,13 @@
 
 void MCP_init(void) {
 	SPI_MasterInit();
-	MCP_init();
+	MCP_reset();
+
+	// Enable transmit-, recieve-, message error-, bus-activity-wake-up- and error-interrupts
+	MCP_write(MCP_CANINTE, 0xFF);
+
+	MCP_bitModify(MCP_CANCTRL, MODE_MASK, MODE_LOOPBACK);	//enter loopback mode
+	
 }
 
 
@@ -66,12 +72,23 @@ void MCP_write(uint8_t address, uint8_t data) {
 	PORTB |= (1 << PB4);
 }
 
-void MCP_requestToSend(void) {
+void MCP_requestToSend(int buffer) {
 	// Select CAN controller
 	PORTB &= ~(1 << PB4);
 	
-	// Send RTS instruction
-	
+	// RTS from buffer 0, 1, 2, or all
+	if (buffer == 0) {
+		SPI_transmit(MCP_RTS_TX0);
+	}
+	else if (buffer == 1) {
+		SPI_transmit(MCP_RTS_TX1);
+	}
+	else if (buffer == 2) {
+		SPI_transmit(MCP_RTS_TX2);
+	}
+	else {
+		SPI_transmit(MCP_RTS_ALL);
+	}
 	
 	// Deselect CAN controller
 	PORTB |= (1 << PB4);

@@ -9,6 +9,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <avr/interrupt.h>
+#define F_CPU 4915200
 
 void timer_8bit256divisionCheckOnlyinit(void) {
 

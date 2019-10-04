@@ -16,7 +16,7 @@ void SPI_MasterInit(void) {
 	DDRB &= ~(1 << DDB6);
 	
 	// Select Master SPI mode, SPI enable, SPI interrupt enable (Global interrupts must be enabled)
-	SPCR |= (1 << MSTR) | (1 << SPE) | (1 << SPIE);
+	SPCR |= (1 << MSTR) | (1 << SPE); //| (1 << SPIE);
 	/*
 		When a serial transfer is complete, the SPIF Flag is set. 
 		An interrupt is generated if SPIE in SPCR is set and global 
