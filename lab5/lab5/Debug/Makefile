@@ -39,6 +39,7 @@ SUBDIRS :=  \
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../Drivers/adc.c \
+../Drivers/can.c \
 ../Drivers/pong.c \
 ../Drivers/controls.c \
 ../Drivers/interrupt.c \
@@ -60,6 +61,7 @@ ASM_SRCS +=
 
 OBJS +=  \
 Drivers/adc.o \
+Drivers/can.o \
 Drivers/pong.o \
 Drivers/controls.o \
 Drivers/interrupt.o \
@@ -74,6 +76,7 @@ lab5.o
 
 OBJS_AS_ARGS +=  \
 Drivers/adc.o \
+Drivers/can.o \
 Drivers/pong.o \
 Drivers/controls.o \
 Drivers/interrupt.o \
@@ -88,6 +91,7 @@ lab5.o
 
 C_DEPS +=  \
 Drivers/adc.d \
+Drivers/can.d \
 Drivers/pong.d \
 Drivers/controls.d \
 Drivers/interrupt.d \
@@ -102,6 +106,7 @@ lab5.d
 
 C_DEPS_AS_ARGS +=  \
 Drivers/adc.d \
+Drivers/can.d \
 Drivers/pong.d \
 Drivers/controls.d \
 Drivers/interrupt.d \
@@ -129,6 +134,13 @@ LINKER_SCRIPT_DEP+=
 
 # AVR32/GNU C Compiler
 Drivers/adc.o: ../Drivers/adc.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 5.4.0
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega162" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Drivers/can.o: ../Drivers/can.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -g2 -Wall -mmcu=atmega162 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega162" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

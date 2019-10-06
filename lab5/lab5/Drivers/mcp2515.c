@@ -8,16 +8,12 @@
 #include "mcp2515.h"
 #include "spi.h"
 #include <avr/io.h>
+#define F_CPU 4915200
+#include <avr/delay.h>
 
 void MCP_init(void) {
 	SPI_MasterInit();
 	MCP_reset();
-
-	// Enable transmit-, recieve-, message error-, bus-activity-wake-up- and error-interrupts
-	MCP_write(MCP_CANINTE, 0xFF);
-
-	MCP_bitModify(MCP_CANCTRL, MODE_MASK, MODE_LOOPBACK);	//enter loopback mode
-	
 }
 
 

@@ -4,6 +4,8 @@
 
 Drivers\adc.c
 
+Drivers\can.c
+
 Drivers\pong.c
 
 Drivers\controls.c

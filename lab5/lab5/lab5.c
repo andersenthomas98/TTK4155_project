@@ -17,8 +17,10 @@
 #include "Drivers/pong.h"
 #include "Drivers/spi.h"
 #include "Drivers/mcp2515.h"
+#include "Drivers/can.h"
 #define F_CPU 4915200
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdlib.h>
 #include "Drivers/oled.h"
@@ -27,13 +29,13 @@
 
 int main(void)
 {
+	INTERRUPT_init();
 	UART_init(MYUBRR);
 	XMEM_init();
-	INTERRUPT_init();
 	btn_init();
-	printf("Starting.... \n\r");
+	printf("\nStarting.... \n\r");
 	timer_8bit256divisionCheckOnlyinit();
-	SPI_MasterInit();
+	CAN_init();
 
 	
 	
@@ -100,10 +102,17 @@ int main(void)
 	MENU_navigate(mainMenuPtr);
 	*/
 	
-
-
+	msg_t msg;
+	msg.id = 0xBB10;
+	msg.length = 3;
+	msg_ptr msgPtr = &msg;
+	
+	
+	//CAN_message_send(msgPtr);
+	
+	
 	while(1) {
-
+		_delay_ms(500);
 		// Testing SPI
 		/*
 		SPI_transmit(0x55);
@@ -111,6 +120,7 @@ int main(void)
 		*/
 		
 		// Testing CAN controller
+		/*
 		MCP_write(MCP_RXF0SIDH, 171);
 		_delay_ms(10);
 		printf("MCP_read = %d\n\r", MCP_read(MCP_RXF0SIDH));
@@ -118,6 +128,12 @@ int main(void)
 		MCP_reset();
 		printf("MCP_read = %d\n\r", MCP_read(MCP_RXF0SIDH));
 		_delay_ms(500);
+		*/
+		
+		// Testing CAN
+		CAN_message_send(msgPtr);
+		
+		_delay_ms(5000);
 		
 		
 	} 

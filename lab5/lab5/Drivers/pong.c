@@ -127,8 +127,8 @@ void pong_fast() {
 			SRAMvalue = XMEM_read(0x800 + (int)y/8 * 128 + (int)x);	//set new ball
 			XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
 			
-			printf("Time elapsed: %d", TIM8_ReadTCNT0());
-			while (TIM8_ReadTCNT0() < 50){
+			//printf("Time elapsed: %d", TIM8_ReadTCNT0());
+			while (TIM8_ReadTCNT0() < 20){
 				
 			}
 		}

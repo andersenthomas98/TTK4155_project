@@ -19,7 +19,7 @@ uint8_t MCP_read(uint8_t address);
 
 void MCP_write(uint8_t address, uint8_t data);
 
-void MCP_requestToSend(void);
+void MCP_requestToSend(int buffer);
 
 void MCP_bitModify(uint8_t address, uint8_t mask, uint8_t data);
 
@@ -89,6 +89,7 @@ Copyright 2003 Kimberly Otten Software Consulting
 #define MCP_RXB0SIDH	0x61
 #define MCP_RXB1CTRL	0x70
 #define MCP_RXB1SIDH	0x71
+
 
 
 #define MCP_TX_INT		0x1C		// Enable all transmit interrupts
