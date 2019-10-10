@@ -49,7 +49,7 @@ void pong_fast() {
 		x_vel = 1;
 		y_vel = 0;
 		while (1) {
-			TIM8_WriteTCNT0(0);
+			TIM8_WriteTCNT2(0);
 			rightPaddleY = (ADC_slider_right()) / 4;
 			leftPaddleY = (ADC_slider_left()) / 4;
 			xPrev = x;
@@ -87,7 +87,14 @@ void pong_fast() {
 			if (y <= 0 || y >= 63) {
 				y_vel = -y_vel;
 			}
-
+			//OBS FLYTTET
+			XMEM_write(0xB0 + (int)y/8, 0xB0 + (int)y/8);	//set page to ball-page
+			XMEM_write((int)x & 0x0F, (int)x & 0x0F);		// Set lower column start address
+			XMEM_write(0x10 + ((int)x >> 4), 0x10 + ((int)x >> 4));  // Set upper column address
+			
+			SRAMvalue = XMEM_read(0x800 + (int)y/8 * 128 + (int)x);	//set new ball
+			XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
+			//OBS FLYTTET
 			for (int page = 0; page < 8; page++) {	//clears buffer along paddle-x-axes
 				XMEM_write(0, 0x800 + page * 128 + 3);
 				XMEM_write(0, 0x800 + page * 128 + 124);
@@ -119,16 +126,12 @@ void pong_fast() {
 				XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
 
 			}
+			//OBS FJERNET
 
-			XMEM_write(0xB0 + (int)y/8, 0xB0 + (int)y/8);	//set page to ball-page
-			XMEM_write((int)x & 0x0F, (int)x & 0x0F);		// Set lower column start address
-			XMEM_write(0x10 + ((int)x >> 4), 0x10 + ((int)x >> 4));  // Set upper column address
-			
-			SRAMvalue = XMEM_read(0x800 + (int)y/8 * 128 + (int)x);	//set new ball
-			XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
+			//OBS FJERNET
 			
 			//printf("Time elapsed: %d", TIM8_ReadTCNT0());
-			while (TIM8_ReadTCNT0() < 20){
+			while (TIM8_ReadTCNT2() < 50){
 				
 			}
 		}

@@ -31,12 +31,12 @@ int main(void)
 {
 	INTERRUPT_init();
 	UART_init(MYUBRR);
+	printf("\n\rmainHeyoo\n\r");
 	XMEM_init();
 	btn_init();
 	printf("\nStarting.... \n\r");
-	timer_8bit1024divisionCheckOnlyinit();
+	timer_0division1024Init();
 	CAN_init(MODE_NORMAL);
-
 	
 	
 	OLED_init();
@@ -111,16 +111,14 @@ int main(void)
 	
 	//CAN_message_send(msgPtr);
 	
-	
 	while(1) {
-		
+		cli();
 		// Testing CAN
 	
-		
-		send_joystick_dir();
-		
-		_delay_ms(300);
-		
+		//send_joystick_dir();
+		printf("current timer value = %d \n\r", TIM8_ReadTCNT0());
+		//printf("interrupt flags: %#X \n\r", TIFR);
+		_delay_ms(4000);
 		
 	} 
 	

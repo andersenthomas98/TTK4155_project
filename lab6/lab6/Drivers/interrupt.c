@@ -11,7 +11,7 @@
 #include "uart.h"
 
 volatile int ADC_INTERRUPT_READY = 0;
-//volatile int SPI_TRANSMISSION_COMPLETE = 0;
+
 
 void INTERRUPT_init() {
 	// disable global interrupts (set SREG register)
@@ -30,6 +30,11 @@ void INTERRUPT_init() {
 	// Enable interrupt on INT0 (from ADC) and INT1 (from MCP)
 	GICR |= (1 << INT0);
 	GICR |= (1 << INT1); 
+		
+	// Setup for timer interrupt
+	OCR0 = 160;
+	TIMSK |= (1 << OCIE0);
+		
 		
 	// Enable global interrupts (set SREG register)
 	sei();
@@ -72,6 +77,8 @@ ISR(INT1_vect) {
 	}
 }
 
-
-
-
+ISR(TIMER0_COMP_vect) {
+	printf("compare\n\r");
+	
+	// Timer is reset automatically
+}

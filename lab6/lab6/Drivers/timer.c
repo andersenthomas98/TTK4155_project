@@ -11,13 +11,21 @@
 #include <avr/interrupt.h>
 #define F_CPU 4915200
 
-void timer_8bit1024divisionCheckOnlyinit(void) {
+void timer_0division1024Init(void) {
 
 	// start the timer
-	TCCR0 = 0b00000101;
+	TCCR0 = 0b00100101;
 	// set prescaler to 1024 (101) and start the timer
-	TIMSK &= ~(1 << OCIE0 | 1 << TOIE0);
-	// disable both compare and overflow interrupts
+
+
+}
+
+void timer_2division1024Init(void) {
+
+	// start the timer
+	TCCR2 = 0b00100101;
+	// set prescaler to 1024 (101) and start the timer
+
 
 }
 
@@ -46,6 +54,37 @@ unsigned int TIM8_ReadTCNT0(void)
 	cli();
 	/* Read TCNTn into i */
 	i = TCNT0;
+	/* Restore Global Interrupt Flag */
+	SREG = sreg;
+	sei();
+	return i;
+}
+
+void TIM8_WriteTCNT2(uint8_t i)
+{
+	unsigned char sreg;
+	//uint8_t i;
+	/* Save Global Interrupt Flag */
+	sreg = SREG;
+	/* Disable interrupts */
+	cli();
+	/* Set TCNTn to i */
+	TCNT2 = i;
+	/* Restore Global Interrupt Flag */
+	SREG = sreg;
+	sei();
+}
+
+unsigned int TIM8_ReadTCNT2(void)
+{
+	unsigned char sreg;
+	uint8_t i;
+	/* Save Global Interrupt Flag */
+	sreg = SREG;
+	/* Disable interrupts */
+	cli();
+	/* Read TCNTn into i */
+	i = TCNT2;
 	/* Restore Global Interrupt Flag */
 	SREG = sreg;
 	sei();
