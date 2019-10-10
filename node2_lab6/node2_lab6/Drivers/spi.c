@@ -10,8 +10,8 @@
 #include <avr/io.h>
 
 void SPI_MasterInit(void) {
-	// Set PB0 (/SS), PB2 (MOSI) and PB1 (SCK) as output
-	DDRB |= (1 << DDB0) | (1 << DDB2) | (1 << DDB1);
+	// Set PB7 (/SS), PB2 (MOSI) and PB1 (SCK) as output
+	DDRB |= (1 << DDB7) | (1 << DDB2) | (1 << DDB1) | (1 << DDB0);
 	
 	// Set PB3 (MISO) as input
 	DDRB &= ~(1 << DDB3);
@@ -28,9 +28,8 @@ void SPI_MasterInit(void) {
 	// Configure clock phase (data is sampled on leading edge)
 	SPCR &= ~(1 << CPHA);
 	
-	// Configure SCK rate (f_osc/4)
-	SPCR &= ~(1 << SPR0);
-	SPCR &= ~(1 << SPR1);
+	// Configure SCK rate (f_osc/16)
+	SPCR |= (1 << SPR0);
 }
 
 void SPI_transmit(uint8_t data) {

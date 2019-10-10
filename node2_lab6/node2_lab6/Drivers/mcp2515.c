@@ -8,7 +8,7 @@
 #include "mcp2515.h"
 #include "spi.h"
 #include <avr/io.h>
-#define F_CPU 4915200
+#define F_CPU 16000000
 #include <avr/delay.h>
 
 void MCP_init(void) {
@@ -19,13 +19,12 @@ void MCP_init(void) {
 
 void MCP_reset(void) {
 	// Initiate data transmission
-	PORTB &= ~(1 << PB0);
+	PORTB &= ~(1 << PB7);
 	
 	// Send RESET instruction
 	SPI_transmit(MCP_RESET);
-	
 	// End data transmission
-	PORTB |= (1 << PB0);
+	PORTB |= (1 << PB7);
 }
 
 
@@ -33,11 +32,11 @@ uint8_t MCP_read(uint8_t address) {
 	uint8_t data;
 	
 	// Select CAN controller
-	PORTB &= ~(1 << PB0);
+	PORTB &= ~(1 << PB7);
 	
 	// Send READ instruction
 	SPI_transmit(MCP_READ);
-	
+
 	// Send address
 	SPI_transmit(address);
 	
@@ -45,7 +44,7 @@ uint8_t MCP_read(uint8_t address) {
 	data = SPI_read();
 	
 	// Deselect CAN controller
-	PORTB |= (1 << PB0);
+	PORTB |= (1 << PB7);
 	
 	return data;
 	
@@ -53,7 +52,7 @@ uint8_t MCP_read(uint8_t address) {
 
 void MCP_write(uint8_t address, uint8_t data) {
 	// Select CAN controller
-	PORTB &= ~(1 << PB0);
+	PORTB &= ~(1 << PB7);
 	
 	// Send WRITE instruction
 	SPI_transmit(MCP_WRITE);
@@ -65,12 +64,12 @@ void MCP_write(uint8_t address, uint8_t data) {
 	SPI_transmit(data);
 	
 	// Deselect CAN controller
-	PORTB |= (1 << PB0);
+	PORTB |= (1 << PB7);
 }
 
 void MCP_requestToSend(int buffer) {
 	// Select CAN controller
-	PORTB &= ~(1 << PB0);
+	PORTB &= ~(1 << PB7);
 	
 	// RTS from buffer 0, 1, 2, or all
 	if (buffer == 0) {
@@ -87,12 +86,12 @@ void MCP_requestToSend(int buffer) {
 	}
 	
 	// Deselect CAN controller
-	PORTB |= (1 << PB0);
+	PORTB |= (1 << PB7);
 }
 
 void MCP_bitModify(uint8_t address, uint8_t mask, uint8_t data) {
 	// Select CAN controller
-	PORTB &= ~(1 << PB0);
+	PORTB &= ~(1 << PB7);
 	
 	// Send BIT MODIFY instruction
 	SPI_transmit(MCP_BITMOD);
@@ -107,14 +106,14 @@ void MCP_bitModify(uint8_t address, uint8_t mask, uint8_t data) {
 	SPI_transmit(data);
 	
 	// Deselect CAN controller
-	PORTB |= (1 << PB0);
+	PORTB |= (1 << PB7);
 }
 
 uint8_t MCP_readStatus(void) {
 	uint8_t data;
 	
 	// Select CAN controller
-	PORTB &= ~(1 << PB0);
+	PORTB &= ~(1 << PB7);
 	
 	// Send READ STATUS instruction
 	SPI_transmit(MCP_READ_STATUS);
@@ -122,7 +121,7 @@ uint8_t MCP_readStatus(void) {
 	data = SPI_read();
 	
 	// Deselect CAN controller
-	PORTB |= (1 << PB0);
+	PORTB |= (1 << PB7);
 	
 	return data;
 	

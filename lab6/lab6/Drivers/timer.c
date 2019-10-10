@@ -11,11 +11,11 @@
 #include <avr/interrupt.h>
 #define F_CPU 4915200
 
-void timer_8bit256divisionCheckOnlyinit(void) {
+void timer_8bit1024divisionCheckOnlyinit(void) {
 
 	// start the timer
 	TCCR0 = 0b00000101;
-	// set prescaler to 256 and start the timer
+	// set prescaler to 1024 (101) and start the timer
 	TIMSK &= ~(1 << OCIE0 | 1 << TOIE0);
 	// disable both compare and overflow interrupts
 

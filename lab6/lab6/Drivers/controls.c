@@ -7,6 +7,7 @@
 
 #include "controls.h"
 #include "adc.h"
+#include "can.h"
 #include <avr/io.h>
 
 
@@ -32,6 +33,16 @@ dir_t joystick_dir(void) {
 		return UP;
 	}
 	return NEUTRAL;
+}
+
+void send_joystick_dir(void) {
+	msg_t msg;
+	msg.id = 0x01;
+	msg.length = 1;
+	msg_ptr msgPtr = &msg;
+	uint8_t joystickDirection = joystick_dir();
+	msg.data[0] = joystickDirection;
+	CAN_message_send(msgPtr);
 }
 
 void btn_init(void) {

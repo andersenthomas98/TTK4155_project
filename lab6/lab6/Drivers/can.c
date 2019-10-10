@@ -12,14 +12,13 @@
 #include "uart.h"
 
 
-void CAN_init(void) {
+void CAN_init(uint8_t mode) {
 	MCP_init();
 	
-	// Enable recieve and message error interrupts
+	// Enable recieve, transmit and message error interrupts
 	MCP_write(MCP_CANINTE, 0b10000101);
 
-	//MCP_bitModify(MCP_CANCTRL, MODE_MASK, MODE_LOOPBACK);	//enter loopback mode
-	MCP_bitModify(MCP_CANCTRL, MODE_MASK, MODE_NORMAL);	//enter normal mode
+	MCP_bitModify(MCP_CANCTRL, MODE_MASK, mode);	//enter specified mode
 	MCP_bitModify(MCP_RXB0CTRL, 0b01100000, 0b01100000); // Turn mask/filters off, recieve any message
 	
 	if (MCP_read(MCP_CANCTRL) & 0b01000000) {

@@ -15,25 +15,28 @@
 #include "Drivers/uart.h"
 #define F_CPU 16000000
 #include <util/delay.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
 #define MYUBRR 103
 
 int main(void)
 {
-	UART_init(MYUBRR);
 	INTERRUPT_init();
-	CAN_init();
+	UART_init(MYUBRR);
+	CAN_init(MODE_NORMAL);
 	
 	msg_t msg;
-	msg.id = 0xA5;
+	msg.id = 0xC1;
 	msg.length = 3;
-	msg.data[0] = 0xC;
+	msg.data[0] = 0xB;
 	msg.data[1] = 0xF;
 	msg_ptr msgPtr = &msg;
 	
     while(1)
-    {
-		printf("new iteration\n\r");
-        CAN_message_send(msgPtr);
-		_delay_ms(1000);
+    {	
+		//CAN_message_send(msgPtr);
+		
+		_delay_ms(6000);
+		
     }
 }

@@ -16,7 +16,7 @@ typedef struct CAN_message {
 		uint8_t data[8];
 }msg_t, *msg_ptr;
 
-void CAN_init(void);
+void CAN_init(uint8_t mode);
 
 void CAN_message_send(msg_ptr msgPtr);
 

@@ -10,6 +10,8 @@
 #include "mcp2515.h"
 #include "uart.h"
 
+#define JOYSTICK_ID 0x1
+
 volatile int ADC_INTERRUPT_READY = 0;
 //volatile int SPI_TRANSMISSION_COMPLETE = 0;
 
@@ -31,7 +33,6 @@ void INTERRUPT_init() {
 
 // CAN interrupts
 ISR(INT2_vect) {
-	printf("interrupt\n\r");
 	if (MCP_read(MCP_CANINTF) & MCP_TX0IF) {
 		printf("Message sendt succesfully\n\r");
 		
@@ -41,10 +42,13 @@ ISR(INT2_vect) {
 	// Message recieved at recieve buffer 0
 	if (MCP_read(MCP_CANINTF) & MCP_RX0IF) {
 		struct CAN_message msg = CAN_message_recieve();
-		printf("--- Message recieved ---\n\r");
-		printf("ID: %#X \n\r", msg.id);
-		printf("Length: %d \n\r", msg.length);
-		printf("Data[0] = %#X \n\r", msg.data[0]);
+		printf("Message recieved with ID: %#X\n\r", msg.id);
+		if (msg.id == JOYSTICK_ID) {
+			printf("JOYSTICK: %d\n\r", msg.data[0]);
+		}
+		else {
+			printf("CANNOT IDENTIFY MESSAGE");
+		}
 	
 		// Reset recieve flag
 		MCP_bitModify(MCP_CANINTF, MCP_RX0IF, 0);

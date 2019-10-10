@@ -24,6 +24,8 @@ pos_t joystick_pos(void);
 
 dir_t joystick_dir(void);
 
+void send_joystick_dir(void);
+
 void btn_init(void);
 
 int btn_right(void);

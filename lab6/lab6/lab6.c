@@ -34,8 +34,8 @@ int main(void)
 	XMEM_init();
 	btn_init();
 	printf("\nStarting.... \n\r");
-	timer_8bit256divisionCheckOnlyinit();
-	CAN_init();
+	timer_8bit1024divisionCheckOnlyinit();
+	CAN_init(MODE_NORMAL);
 
 	
 	
@@ -103,39 +103,23 @@ int main(void)
 	*/
 	
 	msg_t msg;
-	msg.id = 0xA5;
-	msg.length = 3;
-	msg.data[0] = 0xC;
-	msg.data[1] = 0xF;
+	msg.id = 0x01;
+	msg.length = 1;
 	msg_ptr msgPtr = &msg;
 	
+	uint8_t joystickDirection;
 	
 	//CAN_message_send(msgPtr);
 	
 	
 	while(1) {
-		_delay_ms(500);
-		// Testing SPI
-		/*
-		SPI_transmit(0x55);
-		_delay_ms(500);
-		*/
-		
-		// Testing CAN controller
-		/*
-		MCP_write(MCP_RXF0SIDH, 171);
-		_delay_ms(10);
-		printf("MCP_read = %d\n\r", MCP_read(MCP_RXF0SIDH));
-		_delay_ms(10);
-		MCP_reset();
-		printf("MCP_read = %d\n\r", MCP_read(MCP_RXF0SIDH));
-		_delay_ms(500);
-		*/
 		
 		// Testing CAN
-		CAN_message_send(msgPtr);
+	
 		
-		_delay_ms(5000);
+		send_joystick_dir();
+		
+		_delay_ms(300);
 		
 		
 	} 

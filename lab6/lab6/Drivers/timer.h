@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 
-void timer_8bit256divisionCheckOnlyinit(void);
+void timer_8bit1024divisionCheckOnlyinit(void);
 void TIM8_WriteTCNT0(uint8_t i);
 unsigned int TIM8_ReadTCNT0(void);
 
