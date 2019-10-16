@@ -14,7 +14,7 @@
 void timer_0division1024Init(void) {
 
 	// start the timer
-	TCCR0 = 0b00100101;
+	TCCR0 = 0b0001101;	//CTC mode
 	// set prescaler to 1024 (101) and start the timer
 
 

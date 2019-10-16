@@ -29,6 +29,7 @@ void CAN_init(uint8_t mode) {
 void CAN_message_send(msg_ptr msgPtr) {
 	// Set TXB0SIDH (higher ID-register)
 	MCP_write(MCP_TXB0CTRL + 1, (msgPtr->id));
+	//printf("msg ID to be sent = %d\n\r", msgPtr->id);
 	/*
 	// Set TXB0SIDH (higher ID-register)
 	MCP_write(MCP_TXB0CTRL + 1, (msgPtr->id) >> 8);
@@ -46,8 +47,8 @@ void CAN_message_send(msg_ptr msgPtr) {
 		dataIterator++;
 	}
 	
-	
 	MCP_requestToSend(0);
+	
 	// Transmission of CAN msg will start when the device detects that the bus is available...
 }
 

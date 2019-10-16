@@ -12,8 +12,8 @@
 
 
 pos_t joystick_pos(void) {
-	int8_t x_pos = (ADC_read_x()*100/131)-100;
-	int8_t y_pos = (ADC_read_y()*100/131)-100;
+	int8_t x_pos = (ADC_read_x()*100/128)-100;
+	int8_t y_pos = (ADC_read_y()*100/128)-100;
 	pos_t pos = {x_pos, y_pos};
 	return pos;
 }
@@ -42,6 +42,19 @@ void send_joystick_dir(void) {
 	msg_ptr msgPtr = &msg;
 	uint8_t joystickDirection = joystick_dir();
 	msg.data[0] = joystickDirection;
+	CAN_message_send(msgPtr);
+}
+
+void send_joystick_pos(void) {
+	msg_t msg;
+	msg.id = 0x02;
+	msg.length = 2;
+	msg_ptr msgPtr = &msg;
+	pos_t pos = joystick_pos();
+	uint8_t stdPosX = (pos.x + 100) / 2;
+	uint8_t stdPosY = (pos.y + 100) / 2;
+	msg.data[0] = stdPosX;
+	msg.data[1] = stdPosY;
 	CAN_message_send(msgPtr);
 }
 

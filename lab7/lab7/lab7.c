@@ -28,15 +28,14 @@
 
 int main(void)
 {
-	//INTERRUPT_init();
+	INTERRUPT_init();
 	UART_init(MYUBRR);
-	printf("\n\rmainHeyoo\n\r");
 	XMEM_init();
 	//btn_init();
 	printf("\nStarting.... \n\r");
-	//timer_0division1024Init();
-	//timer_2division1024Init();
-	//CAN_init(MODE_NORMAL);
+	timer_0division1024Init();
+	timer_2division1024Init();
+	CAN_init(MODE_NORMAL);
 	
 	
 	OLED_init();
@@ -112,11 +111,14 @@ int main(void)
 	} 
 	
 	return 0;*/
+	
+	//pos_t pos = joystick_pos();
 	while(1){
-		SRAM_test();
-		printf("anothaone");
-		_delay_ms(1);
-		OLED_refresh();
+		//send_joystick_pos();
+// 		printf("joystickvalue y = %d \n\r", pos.y);
+ 		_delay_ms(500);
+// 		pos = joystick_pos();
+		//printf("iteration");
 	}
 	
 }

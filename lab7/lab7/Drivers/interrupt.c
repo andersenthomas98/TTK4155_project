@@ -32,7 +32,7 @@ void INTERRUPT_init() {
 	GICR |= (1 << INT1); 
 		
 	// Setup for timer interrupt
-	OCR0 = 160;
+	OCR0 = 100;
 	TIMSK |= (1 << OCIE0);
 		
 		
@@ -56,7 +56,7 @@ ISR(INT0_vect) {
 // CAN interrupts
 ISR(INT1_vect) {
 	if (MCP_read(MCP_CANINTF) & MCP_TX0IF) {
-		printf("Message sendt succesfully\n\r");
+		//printf("Message sendt succesfully\n\r");
 		
 		// Reset transmit flag
 		MCP_bitModify(MCP_CANINTF, MCP_TX0IF, 0);
@@ -78,7 +78,8 @@ ISR(INT1_vect) {
 }
 
 ISR(TIMER0_COMP_vect) {
-	printf("compare\n\r");
-	
+	sei();
+
+	send_joystick_pos();
 	// Timer is reset automatically
 }
