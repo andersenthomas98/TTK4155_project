@@ -10,7 +10,8 @@
 #include "mcp2515.h"
 #include "uart.h"
 
-#define JOYSTICK_ID 0x1
+#define JOYSTICK_DIR_ID 0x1
+#define JOYSTICK_POS_ID 0x2
 
 volatile int ADC_INTERRUPT_READY = 0;
 //volatile int SPI_TRANSMISSION_COMPLETE = 0;
@@ -34,7 +35,7 @@ void INTERRUPT_init() {
 // CAN interrupts
 ISR(INT2_vect) {
 	if (MCP_read(MCP_CANINTF) & MCP_TX0IF) {
-		printf("Message sendt succesfully\n\r");
+		//printf("Message sendt succesfully\n\r");
 		
 		// Reset transmit flag
 		MCP_bitModify(MCP_CANINTF, MCP_TX0IF, 0);
@@ -42,9 +43,13 @@ ISR(INT2_vect) {
 	// Message recieved at recieve buffer 0
 	if (MCP_read(MCP_CANINTF) & MCP_RX0IF) {
 		struct CAN_message msg = CAN_message_recieve();
-		printf("Message recieved with ID: %#X\n\r", msg.id);
-		if (msg.id == JOYSTICK_ID) {
+		//printf("Message recieved with ID: %#X\n\r", msg.id);
+		if (msg.id == JOYSTICK_DIR_ID) {
 			printf("JOYSTICK: %d\n\r", msg.data[0]);
+		}
+		else if (msg.id == JOYSTICK_POS_ID){
+			//printf("Joystick x pos = %d\n\r", msg.data[0]);
+			PWM_set_duty_cycle(msg.data[0]);
 		}
 		else {
 			printf("CANNOT IDENTIFY MESSAGE");
@@ -54,10 +59,8 @@ ISR(INT2_vect) {
 		MCP_bitModify(MCP_CANINTF, MCP_RX0IF, 0);
 	}
 	if (MCP_read(MCP_CANINTF) & MCP_MERRF) {
-		printf("CAN BUS ERROR!");
+		//printf("CAN BUS ERROR!");
 	}
 }
-
-
 
 

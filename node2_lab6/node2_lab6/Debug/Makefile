@@ -41,6 +41,7 @@ C_SRCS +=  \
 ../Drivers/can.c \
 ../Drivers/interrupt.c \
 ../Drivers/mcp2515.c \
+../Drivers/pwm.c \
 ../Drivers/spi.c \
 ../Drivers/uart.c \
 ../node2_lab6.c
@@ -56,6 +57,7 @@ OBJS +=  \
 Drivers/can.o \
 Drivers/interrupt.o \
 Drivers/mcp2515.o \
+Drivers/pwm.o \
 Drivers/spi.o \
 Drivers/uart.o \
 node2_lab6.o
@@ -64,6 +66,7 @@ OBJS_AS_ARGS +=  \
 Drivers/can.o \
 Drivers/interrupt.o \
 Drivers/mcp2515.o \
+Drivers/pwm.o \
 Drivers/spi.o \
 Drivers/uart.o \
 node2_lab6.o
@@ -72,6 +75,7 @@ C_DEPS +=  \
 Drivers/can.d \
 Drivers/interrupt.d \
 Drivers/mcp2515.d \
+Drivers/pwm.d \
 Drivers/spi.d \
 Drivers/uart.d \
 node2_lab6.d
@@ -80,6 +84,7 @@ C_DEPS_AS_ARGS +=  \
 Drivers/can.d \
 Drivers/interrupt.d \
 Drivers/mcp2515.d \
+Drivers/pwm.d \
 Drivers/spi.d \
 Drivers/uart.d \
 node2_lab6.d
@@ -113,6 +118,13 @@ Drivers/interrupt.o: ../Drivers/interrupt.c
 	
 
 Drivers/mcp2515.o: ../Drivers/mcp2515.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 5.4.0
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Drivers/pwm.o: ../Drivers/pwm.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

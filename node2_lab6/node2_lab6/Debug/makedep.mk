@@ -8,6 +8,8 @@ Drivers\interrupt.c
 
 Drivers\mcp2515.c
 
+Drivers\pwm.c
+
 Drivers\spi.c
 
 Drivers\uart.c

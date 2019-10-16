@@ -13,6 +13,7 @@
 #include "Drivers/mcp2515.h"
 #include "Drivers/spi.h"
 #include "Drivers/uart.h"
+#include "Drivers/pwm.h"
 #define F_CPU 16000000
 #include <util/delay.h>
 #include <avr/io.h>
@@ -21,9 +22,13 @@
 
 int main(void)
 {
-	INTERRUPT_init();
+	
 	UART_init(MYUBRR);
+	printf("Node 2 starting...\n\r");
+	INTERRUPT_init();
 	CAN_init(MODE_NORMAL);
+	PWM_init();
+	
 	
 	msg_t msg;
 	msg.id = 0xC1;
@@ -35,8 +40,8 @@ int main(void)
     while(1)
     {	
 		//CAN_message_send(msgPtr);
-		
-		_delay_ms(6000);
+		//PWM_set_duty_cycle(10);
+		_delay_ms(1);
 		
     }
 }
