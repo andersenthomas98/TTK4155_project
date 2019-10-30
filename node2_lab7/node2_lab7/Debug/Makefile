@@ -39,11 +39,13 @@ SUBDIRS :=  \
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../Drivers/can.c \
+../Drivers/motor.c \
 ../Drivers/IR.c \
 ../Drivers/interrupt.c \
 ../Drivers/mcp2515.c \
 ../Drivers/pwm.c \
 ../Drivers/spi.c \
+../Drivers/TWI_Master.c \
 ../Drivers/uart.c \
 ../node2_lab7.c
 
@@ -56,41 +58,49 @@ ASM_SRCS +=
 
 OBJS +=  \
 Drivers/can.o \
+Drivers/motor.o \
 Drivers/IR.o \
 Drivers/interrupt.o \
 Drivers/mcp2515.o \
 Drivers/pwm.o \
 Drivers/spi.o \
+Drivers/TWI_Master.o \
 Drivers/uart.o \
 node2_lab7.o
 
 OBJS_AS_ARGS +=  \
 Drivers/can.o \
+Drivers/motor.o \
 Drivers/IR.o \
 Drivers/interrupt.o \
 Drivers/mcp2515.o \
 Drivers/pwm.o \
 Drivers/spi.o \
+Drivers/TWI_Master.o \
 Drivers/uart.o \
 node2_lab7.o
 
 C_DEPS +=  \
 Drivers/can.d \
+Drivers/motor.d \
 Drivers/IR.d \
 Drivers/interrupt.d \
 Drivers/mcp2515.d \
 Drivers/pwm.d \
 Drivers/spi.d \
+Drivers/TWI_Master.d \
 Drivers/uart.d \
 node2_lab7.d
 
 C_DEPS_AS_ARGS +=  \
 Drivers/can.d \
+Drivers/motor.d \
 Drivers/IR.d \
 Drivers/interrupt.d \
 Drivers/mcp2515.d \
 Drivers/pwm.d \
 Drivers/spi.d \
+Drivers/TWI_Master.d \
 Drivers/uart.d \
 node2_lab7.d
 
@@ -109,6 +119,13 @@ LINKER_SCRIPT_DEP+=
 
 # AVR32/GNU C Compiler
 Drivers/can.o: ../Drivers/can.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 5.4.0
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Drivers/motor.o: ../Drivers/motor.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
@@ -144,6 +161,13 @@ Drivers/pwm.o: ../Drivers/pwm.c
 	
 
 Drivers/spi.o: ../Drivers/spi.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler : 5.4.0
+	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 
+	@echo Finished building: $<
+	
+
+Drivers/TWI_Master.o: ../Drivers/TWI_Master.c
 	@echo Building file: $<
 	@echo Invoking: AVR/GNU C Compiler : 5.4.0
 	$(QUOTE)C:\Program Files (x86)\Atmel\Studio\7.0\toolchain\avr8\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE)  -x c -funsigned-char -funsigned-bitfields -DDEBUG  -I"C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\include"  -O1 -ffunction-sections -fdata-sections -fpack-struct -fshort-enums -mrelax -g2 -Wall -mmcu=atmega2560 -B "C:\Program Files (x86)\Atmel\Studio\7.0\Packs\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega2560" -c -std=gnu99 -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -MT"$(@:%.o=%.o)"   -o "$@" "$<" 

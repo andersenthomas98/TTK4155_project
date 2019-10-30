@@ -15,8 +15,8 @@
 void CAN_init(uint8_t mode) {
 	MCP_init();
 	
-	// Enable recieve, transmit and message error interrupts
-	MCP_write(MCP_CANINTE, 0b10000101);
+	// Enable receive and transmit interrupts
+	MCP_write(MCP_CANINTE, 0b00000101);
 
 	MCP_bitModify(MCP_CANCTRL, MODE_MASK, mode);	//enter specified mode
 	MCP_bitModify(MCP_RXB0CTRL, 0b01100000, 0b01100000); // Turn mask/filters off, recieve any message

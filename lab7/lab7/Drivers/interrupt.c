@@ -33,7 +33,7 @@ void INTERRUPT_init() {
 		
 	// Setup for timer interrupt
 	OCR0 = 100;
-	TIMSK |= (1 << OCIE0);
+	//TIMSK |= (1 << OCIE0);	OBS RENABLE DENNE
 		
 		
 	// Enable global interrupts (set SREG register)
@@ -69,11 +69,12 @@ ISR(INT1_vect) {
 		printf("Length: %d \n\r", msg.length);
 		printf("Data[0] = %#X \n\r", msg.data[0]);
 	
-		// Reset recieve flag
+		// Reset receive flag
 		MCP_bitModify(MCP_CANINTF, MCP_RX0IF, 0);
 	}
 	if (MCP_read(MCP_CANINTF) & MCP_MERRF) {
 		printf("CAN BUS ERROR!");
+		MCP_bitModify(MCP_CANINTF, MCP_MERRF, 0);
 	}
 }
 

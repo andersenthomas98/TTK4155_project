@@ -34,6 +34,16 @@ dir_t joystick_dir(void) {
 	}
 	return NEUTRAL;
 }
+/*
+void continuous_send(){
+	timer 2 = 0
+	send joystick pos 
+	send slider pos
+	send button state
+	while timer 2 count < 100 {
+		
+	}
+}*/
 
 void send_joystick_dir(void) {
 	msg_t msg;
@@ -51,8 +61,8 @@ void send_joystick_pos(void) {
 	msg.length = 2;
 	msg_ptr msgPtr = &msg;
 	pos_t pos = joystick_pos();
-	uint8_t stdPosX = (pos.x + 100) / 2;
-	uint8_t stdPosY = (pos.y + 100) / 2;
+	uint8_t stdPosX = ((pos.x + 101) / 4) * 2; // Senker oppløsning for å unngå dirring ved å bruke heltalldivisjon
+	uint8_t stdPosY = ((pos.y + 101) / 4) * 2;
 	msg.data[0] = stdPosX;
 	msg.data[1] = stdPosY;
 	CAN_message_send(msgPtr);

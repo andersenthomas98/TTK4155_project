@@ -30,6 +30,7 @@ int main(void)
 	CAN_init(MODE_NORMAL);
 	PWM_init();
 	IR_init();
+	MOTOR_init();
 	
 	
 	msg_t msg;
@@ -41,8 +42,7 @@ int main(void)
 	
 	while(1)
 	{
-		printf("ADC = %d\n\r", IR_read());	
-		_delay_ms(100);
-		
+		MOTOR_encoder_read();
+		_delay_ms(30);
 	}
 }

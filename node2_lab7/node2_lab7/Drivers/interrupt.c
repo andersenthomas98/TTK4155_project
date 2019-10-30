@@ -9,6 +9,7 @@
 #include "can.h"
 #include "mcp2515.h"
 #include "uart.h"
+#include "motor.h"
 
 #define JOYSTICK_DIR_ID 0x1
 #define JOYSTICK_POS_ID 0x2
@@ -34,13 +35,14 @@ void INTERRUPT_init() {
 
 // CAN interrupts
 ISR(INT2_vect) {
+	//printf("interrupt\n\r");
 	if (MCP_read(MCP_CANINTF) & MCP_TX0IF) {
 		//printf("Message sendt succesfully\n\r");
 		
 		// Reset transmit flag
 		MCP_bitModify(MCP_CANINTF, MCP_TX0IF, 0);
 	}
-	// Message recieved at recieve buffer 0
+	// Message received at receive buffer 0
 	if (MCP_read(MCP_CANINTF) & MCP_RX0IF) {
 		struct CAN_message msg = CAN_message_recieve();
 		//printf("Message recieved with ID: %#X\n\r", msg.id);
@@ -49,7 +51,13 @@ ISR(INT2_vect) {
 		}
 		else if (msg.id == JOYSTICK_POS_ID){
 			//printf("Joystick x pos = %d\n\r", msg.data[0]);
-			PWM_set_duty_cycle(msg.data[0]);
+			//PWM_set_duty_cycle(msg.data[0]);
+			sei();
+			if (msg.data[0] > 50) {
+				MOTOR_set((msg.data[0]-50)*5, 0);
+			} else {
+				MOTOR_set(255-(5*msg.data[0]), 1);
+			}
 		}
 		else {
 			printf("CANNOT IDENTIFY MESSAGE");
