@@ -13,7 +13,7 @@
 void OLED_init(void);
 void OLED_pos(uint8_t x, uint8_t y);
 void OLED_print_char(char c, int offset);
-void OLED_print_string(char *c, int page);
+void OLED_print_string(char *c, int offset);
 void OLED_clearAll(void);
 void OLED_setBrightness(uint8_t level);
 

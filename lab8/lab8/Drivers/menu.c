@@ -11,6 +11,7 @@
 #include "controls.h"
 #include "timer.h"
 #include "pong.h"
+#include "can.h"
 #include <stdlib.h>
 #include <stddef.h>
 #include <math.h>
@@ -112,10 +113,16 @@ void MENU_playGame(void) {
 	OLED_clearAll();
 	OLED_print_string("Playing game", 128*3);
 	OLED_refresh();
+	msg_t msg;
+	msg.id = 0x04;
+	msg.length = 1;
+	msg_ptr msgPtr = &msg;
+	CAN_message_send(msgPtr);
 	while (1) {
-		send_joystick_pos();
-		// Update 24 times per second
-		while (TIM8_ReadTCNT0() < 200);
+		send_slider_joystick_button();
+		OLED_refresh();
+		// Update 48 times per second
+		while (TIM8_ReadTCNT0() < 100);
 	}
 }
 

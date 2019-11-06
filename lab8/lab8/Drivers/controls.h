@@ -28,6 +28,8 @@ void send_joystick_dir(void);
 
 void send_joystick_pos(void);
 
+void send_slider_joystick_button(void);
+
 void btn_init(void);
 
 int btn_right(void);
