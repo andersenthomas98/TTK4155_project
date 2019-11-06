@@ -13,8 +13,13 @@
 
 #define JOYSTICK_DIR_ID 0x1
 #define JOYSTICK_POS_ID 0x2
+#define JOYSTICK_SLIDER_POS_ID 0x3
+#define START_GAME 0x4
 
 volatile int ADC_INTERRUPT_READY = 0;
+volatile uint8_t SLIDER_POS;
+volatile int GAME_START = 0;
+volatile int GAME_SCORE = 0;
 //volatile int SPI_TRANSMISSION_COMPLETE = 0;
 
 void INTERRUPT_init() {
@@ -42,7 +47,7 @@ ISR(INT2_vect) {
 		// Reset transmit flag
 		MCP_bitModify(MCP_CANINTF, MCP_TX0IF, 0);
 	}
-	// Message received at receive buffer 0
+	// Message received at receive buffer 0	
 	if (MCP_read(MCP_CANINTF) & MCP_RX0IF) {
 		struct CAN_message msg = CAN_message_recieve();
 		//printf("Message recieved with ID: %#X\n\r", msg.id);
@@ -52,12 +57,23 @@ ISR(INT2_vect) {
 		else if (msg.id == JOYSTICK_POS_ID){
 			//printf("Joystick x pos = %d\n\r", msg.data[0]);
 			//PWM_set_duty_cycle(msg.data[0]);
-			sei();
+			//sei();
 			if (msg.data[0] > 50) {
 				MOTOR_set((msg.data[0]-50)*5, 0);
 			} else {
 				MOTOR_set(255-(5*msg.data[0]), 1);
 			}
+		}
+		else if (msg.id == JOYSTICK_SLIDER_POS_ID) {
+			
+			SLIDER_POS = (int8_t)msg.data[0]; // Position of (right) slider
+			PWM_set_duty_cycle(msg.data[1]);  // Set servo position
+			
+			
+			
+		}
+		else if (msg.id == START_GAME){
+			GAME_START = 1;
 		}
 		else {
 			printf("CANNOT IDENTIFY MESSAGE");
@@ -66,9 +82,20 @@ ISR(INT2_vect) {
 		// Reset recieve flag
 		MCP_bitModify(MCP_CANINTF, MCP_RX0IF, 0);
 	}
+	
 	if (MCP_read(MCP_CANINTF) & MCP_MERRF) {
-		//printf("CAN BUS ERROR!");
-	}
+		printf("CBE!");
+		// Reset error flag
+		MCP_bitModify(MCP_CANINTF, MCP_MERRF, 0);
+	} 
 }
 
-
+ISR(TIMER3_OVF_vect){
+	GAME_SCORE += 1;
+	msg_t msg;
+	msg.id = 0x10;
+	msg.length = 1;
+	msg_ptr msgPtr = &msg;
+	msg.data[0] = GAME_SCORE;
+	CAN_message_send(msgPtr);
+}

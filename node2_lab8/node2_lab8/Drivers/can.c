@@ -15,7 +15,7 @@
 void CAN_init(uint8_t mode) {
 	MCP_init();
 	
-	// Enable recieve, transmit and message error interrupts
+	// Enable receive and transmit interrupts
 	MCP_write(MCP_CANINTE, 0b00000101); // HVORFOR MÅ VI GJØRE DETTE TO GANGER?
 	MCP_bitModify(MCP_CANINTE, 0b00000101, 0b10000101);
 	printf("interrupts for mcp = %#X \n\r", MCP_read(MCP_CANINTE));

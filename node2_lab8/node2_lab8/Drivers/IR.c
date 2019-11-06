@@ -25,7 +25,7 @@ void IR_init(void) {
 
 uint8_t IR_read(void) {
 	// For 8-bit resolution, we only need to read ADCH and not ADCL
-	return ADCH
+	return ADCH;
 	// TODO: Return the average value of the digital signal over 4 A-D conversions (digital filter to reduce noise) --> maybe not needed
 }
 
