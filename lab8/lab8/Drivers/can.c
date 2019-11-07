@@ -5,6 +5,8 @@
  *  Author: thoander
  */ 
 
+#include <avr/interrupt.h>
+
 #include "can.h"
 #include "mcp2515.h"
 #include <stdlib.h>
@@ -27,6 +29,7 @@ void CAN_init(uint8_t mode) {
 }
 
 void CAN_message_send(msg_ptr msgPtr) {
+	cli();
 	// Set TXB0SIDH (higher ID-register)
 	MCP_write(MCP_TXB0CTRL + 1, (msgPtr->id));
 	//printf("msg ID to be sent = %d\n\r", msgPtr->id);
@@ -48,7 +51,7 @@ void CAN_message_send(msg_ptr msgPtr) {
 	}
 	
 	MCP_requestToSend(0);
-	
+	sei();
 	// Transmission of CAN msg will start when the device detects that the bus is available...
 }
 
@@ -57,7 +60,7 @@ msg_t CAN_message_recieve(void) {
 	
 	// Read ID from RXB0SIDH and RXB0SIDL
 	uint8_t upperId = MCP_read(MCP_RXB0CTRL + 1);
-	printf("recieved upper ID = %#X \n\r", upperId);
+	//printf("recieved upper ID = %#X \n\r", upperId);
 	//uint8_t lowerId = MCP_read(MCP_RXB0CTRL + 2);
 	//printf("recieved lower ID = %#X \n\r", lowerId);
 	//msg.id =  (upperId << 8) + lowerId;

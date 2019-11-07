@@ -33,6 +33,9 @@ void pong_fast() {
 
 	uint8_t rightPaddleX = 124;
 	uint8_t rightPaddleY = 31;
+	uint8_t rightPaddleYmeasLast = 31;
+	uint8_t rightPaddleYmeasLastLast = 31;
+	uint8_t rightPaddleYmeas = 31;
 	uint8_t lowerColRightPaddle = 124 & 0x0F;	//left paddle
 	uint8_t upperColRightPaddle = 124 >> 4;
 
@@ -50,20 +53,14 @@ void pong_fast() {
 		y_vel = 0;
 		while (1) {
 			TIM8_WriteTCNT2(0);
-			rightPaddleY = (ADC_slider_right()) / 4;
+			rightPaddleYmeasLastLast = rightPaddleYmeasLast;
+			rightPaddleYmeasLast = rightPaddleYmeas;
+			rightPaddleYmeas = (ADC_slider_right()) / 4;
+			rightPaddleY = (rightPaddleYmeas + rightPaddleYmeasLast + rightPaddleYmeasLastLast)/3;	//example of a digital filter; note we use the last measurements, not the last values
 			leftPaddleY = (ADC_slider_left()) / 4;
 			xPrev = x;
 			yPrev = y;
-			
-			OLED_reset_pixel((int)xPrev, (int)yPrev);	//clears last ball location
-			
-			XMEM_write(0xB0 + (int)yPrev/8, 0xB0 + (int)yPrev/8);	//set page to ball-page
-			XMEM_write((int)xPrev & 0x0F, (int)xPrev & 0x0F);		// Set lower column start address
-			XMEM_write(0x10 + ((int)xPrev >> 4), 0x10 + ((int)xPrev >> 4));  // Set upper column address
-			
-			SRAMvalue = XMEM_read(0x800 + (int)yPrev/8 * 128 + (int)xPrev);	//remove old ball
-			XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
-			
+
 			x += x_vel;
 			y += y_vel;
 			if (x <= 0) {
@@ -87,6 +84,18 @@ void pong_fast() {
 			if (y <= 0 || y >= 63) {
 				y_vel = -y_vel;
 			}
+						
+			OLED_reset_pixel((int)xPrev, (int)yPrev);	//clears last ball location
+			
+			XMEM_write(0xB0 + (int)yPrev/8, 0xB0 + (int)yPrev/8);	//set page to ball-page
+			XMEM_write((int)xPrev & 0x0F, (int)xPrev & 0x0F);		// Set lower column start address
+			XMEM_write(0x10 + ((int)xPrev >> 4), 0x10 + ((int)xPrev >> 4));  // Set upper column address
+			
+			SRAMvalue = XMEM_read(0x800 + (int)yPrev/8 * 128 + (int)xPrev);	//remove old ball
+			XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
+			
+			OLED_set_pixel((int)x, (int)y);	//sets current ball c
+			
 			//OBS FLYTTET
 			XMEM_write(0xB0 + (int)y/8, 0xB0 + (int)y/8);	//set page to ball-page
 			XMEM_write((int)x & 0x0F, (int)x & 0x0F);		// Set lower column start address
@@ -95,6 +104,8 @@ void pong_fast() {
 			SRAMvalue = XMEM_read(0x800 + (int)y/8 * 128 + (int)x);	//set new ball
 			XMEM_write(SRAMvalue, 0x200 + SRAMvalue);
 			//OBS FLYTTET
+			
+			
 			for (int page = 0; page < 8; page++) {	//clears buffer along paddle-x-axes
 				XMEM_write(0, 0x800 + page * 128 + 3);
 				XMEM_write(0, 0x800 + page * 128 + 124);
@@ -104,10 +115,6 @@ void pong_fast() {
 				OLED_set_pixel(leftPaddleX, leftPaddleY + i);
 				OLED_set_pixel(rightPaddleX, rightPaddleY + i);
 			}
-			OLED_set_pixel((int)x, (int)y);	//sets current ball c
-			OLED_reset_pixel((int)xPrev, (int)yPrev);	//clears last ball location
-
-
 
 
 			for (int page = 0; page < 8; page++) {	//set OLED along left paddle column
@@ -131,7 +138,7 @@ void pong_fast() {
 			//OBS FJERNET
 			
 			//printf("Time elapsed: %d", TIM8_ReadTCNT0());
-			while (TIM8_ReadTCNT2() < 200){
+			while (TIM8_ReadTCNT2() < 50){		//50 is OK speed, 20 is nearly unplayable
 				
 			}
 		}
@@ -196,9 +203,9 @@ void pong_slow() {
 				OLED_set_pixel((int)rightPaddleX, (int)rightPaddleY + i);
 			}
 			OLED_set_pixel((int)x, (int)y);
-			TIM8_WriteTCNT0(0);
+			//TIM8_WriteTCNT0(0);
 			OLED_refresh();
-			printf("Time elapsed: %d", 256 + TIM8_ReadTCNT0());
+			//printf("Time elapsed: %d", 256 + TIM8_ReadTCNT0());
 			
 		}
 		OLED_clearAll();

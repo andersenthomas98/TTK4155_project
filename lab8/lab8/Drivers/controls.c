@@ -78,6 +78,7 @@ void send_slider_joystick_button(void) {
 	int8_t stdPosX = ((pos.x + 2) / 6) * 6;
 	msg.data[1] = (stdPosX+97)/2;
 	msg.data[2] = btn_right();
+	printf("btn_right = %d\n\r", msg.data[2]);
 	CAN_message_send(msgPtr);
 }
 

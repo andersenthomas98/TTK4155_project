@@ -111,7 +111,7 @@ void MENU_animation() {
 
 void MENU_playGame(void) {
 	OLED_clearAll();
-	OLED_print_string("Playing game", 128*3);
+	OLED_print_string("Playing game", 128*1 + 20);
 	OLED_refresh();
 	msg_t msg;
 	msg.id = 0x04;
@@ -119,10 +119,11 @@ void MENU_playGame(void) {
 	msg_ptr msgPtr = &msg;
 	CAN_message_send(msgPtr);
 	while (1) {
+		TIM8_WriteTCNT0(0);
 		send_slider_joystick_button();
-		OLED_refresh();
-		// Update 48 times per second
-		while (TIM8_ReadTCNT0() < 100);
+		// Update 24 times per second
+		while (TIM8_ReadTCNT0() < 200);
+		//printf("iteration\r");
 	}
 }
 

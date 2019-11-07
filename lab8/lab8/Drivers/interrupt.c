@@ -67,10 +67,16 @@ ISR(INT1_vect) {
 		printf("--- Message recieved ---\n\r");
 		printf("ID: %#X \n\r", msg.id);
 		//printf("Length: %d \n\r", msg.length);
-		//printf("Data[0] = %#X \n\r", msg.data[0]);
+		printf("Data[0] = %#X \n\r", msg.data[0]);
 		
 		if (msg.id == 0x10){
-			OLED_print_string(msg.data[0], 3*128 + 60);	//recieved updated score
+			volatile char str[8];
+			sprintf(str, "%d", msg.data[0]);
+			if (msg.data[0] == 0){
+				OLED_clearAll();
+				OLED_print_string("Playing game", 128*1 + 20);	
+			}
+			OLED_print_string(str, 3*128 + 60);	//recieved updated score
 			OLED_refresh();
 		}
 	
@@ -81,11 +87,11 @@ ISR(INT1_vect) {
 	if (MCP_read(MCP_CANINTF) & MCP_MERRF) {
 		printf("CBE!");
 		//MCP_bitModify(MCP_CANINTF, MCP_MERRF, 0);
-	} 
+	}
 
 }
 
-ISR(TIMER0_COMP_vect) {}
+ISR(TIMER0_COMP_vect) {
 
 	send_joystick_pos();
 	// Timer is reset automatically
