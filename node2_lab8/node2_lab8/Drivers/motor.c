@@ -9,6 +9,7 @@
 #include "TWI_Master.h"
 #include "interrupt.h"
 #include "timer.h"
+#include "IR.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdint.h>
@@ -48,6 +49,10 @@ void MOTOR_init(void) {
 	PORTH &= ~(1 << _RST);
 	_delay_us(100);
 	PORTH |= (1 << _RST);
+	
+	// Initialize PL6 as output to trigger the solenoid
+	DDRL |= (1 << PL6);
+	PORTL |= (1 << PL6);
 }
 
 void MOTOR_DAC_write(uint8_t d) {
@@ -109,9 +114,9 @@ int16_t MOTOR_encoder_read(void) {
 void MOTOR_control() {
 	int last_error = 0;
 	float integral_error = 0;
-	float Kp = 0.03;
-	float Ki = 0.15;
-	float K_d = 0.02;
+	float Kp = 0.035;
+	float Ki = 0.2;
+	float K_d = 0.025;
 	float T = 0.003;//0.01;
 
 	int16_t output = 0;
@@ -125,7 +130,7 @@ void MOTOR_control() {
 	while (!GAME_START); // Do nothing
 	printf("game starting\n\r");
 
-	timer_3division256Init();	//start the score timer
+	//timer_3division256Init();	//start the score timer
 	
 	// Reset encoder value right after we start
 	PORTH &= ~(1 << _RST);
@@ -146,7 +151,7 @@ void MOTOR_control() {
 			integral_error += error;
 		}
 		output = (Kp * error) + (T * Ki * integral_error) - (K_d * (value - lastValue));
-		//printf("reference=%4d,slider_pos=%3d, controller output=%4d\r", reference, SLIDER_POS, output);
+		printf("reference=%4d,slider_pos=%3d, controller output=%4d\r", reference, SLIDER_POS, output);
 		//_delay_ms(200);
 		///*
 		if (abs(output) == output){
@@ -166,7 +171,10 @@ void MOTOR_control() {
 			}
 		}
 		//*/
-
+		//printf("IR value = %4d\r", IR_read());
+		if (IR_read() < 100){
+			GAME_SCORE = 0;
+		}
 		while(TIM8_ReadTCNT0() < 50);	//OBSOBS her 157 for å få ca T = 0.01
 	}
 	

@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "uart.h"
+#include <avr/interrupt.h>
 
 
 void CAN_init(uint8_t mode) {
@@ -29,6 +30,7 @@ void CAN_init(uint8_t mode) {
 }
 
 void CAN_message_send(msg_ptr msgPtr) {
+	cli();
 	// Set TXB0SIDH (higher ID-register)
 	MCP_write(MCP_TXB0CTRL + 1, (msgPtr->id));
 	
@@ -42,6 +44,7 @@ void CAN_message_send(msg_ptr msgPtr) {
 	}
 	MCP_requestToSend(0);
 	// Transmission of CAN msg will start when the device detects that the bus is available...
+	sei();
 }
 
 msg_t CAN_message_recieve(void) {

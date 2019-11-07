@@ -13,7 +13,7 @@
 
 #define JOYSTICK_DIR_ID 0x1
 #define JOYSTICK_POS_ID 0x2
-#define JOYSTICK_SLIDER_POS_ID 0x3
+#define JOYSTICK_SLIDER_BUTTON_ID 0x3
 #define START_GAME 0x4
 
 volatile int ADC_INTERRUPT_READY = 0;
@@ -64,10 +64,17 @@ ISR(INT2_vect) {
 				MOTOR_set(255-(5*msg.data[0]), 1);
 			}
 		}
-		else if (msg.id == JOYSTICK_SLIDER_POS_ID) {
+		else if (msg.id == JOYSTICK_SLIDER_BUTTON_ID) {
 			
 			SLIDER_POS = (int8_t)msg.data[0]; // Position of (right) slider
 			PWM_set_duty_cycle(msg.data[1]);  // Set servo position
+			if (msg.data[2] == 2) { // If button is pressed
+				printf("Trigger!\n\r");
+				PORTL &= ~(1 << PL6);  // Trigger solenoid
+			}
+			else {
+				PORTL |= (1 << PL6);
+			}
 			
 			
 			
@@ -91,11 +98,11 @@ ISR(INT2_vect) {
 }
 
 ISR(TIMER3_OVF_vect){
-	GAME_SCORE += 1;
 	msg_t msg;
 	msg.id = 0x10;
 	msg.length = 1;
 	msg_ptr msgPtr = &msg;
 	msg.data[0] = GAME_SCORE;
 	CAN_message_send(msgPtr);
+	GAME_SCORE += 1;
 }

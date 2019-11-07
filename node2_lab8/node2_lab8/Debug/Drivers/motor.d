@@ -1,7 +1,8 @@
 Drivers/motor.d Drivers/motor.o: ../Drivers/motor.c ../Drivers/motor.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\lib\gcc\avr\5.4.0\include\stdint.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\stdint.h \
- ../Drivers/TWI_Master.h ../Drivers/interrupt.h \
+ ../Drivers/TWI_Master.h ../Drivers/interrupt.h ../Drivers/timer.h \
+ ../Drivers/IR.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\io.h \
  c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\sfr_defs.h \
@@ -28,6 +29,10 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 ../Drivers/TWI_Master.h:
 
 ../Drivers/interrupt.h:
+
+../Drivers/timer.h:
+
+../Drivers/IR.h:
 
 c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\include\avr\interrupt.h:
 
