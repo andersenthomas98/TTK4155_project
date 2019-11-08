@@ -11,6 +11,7 @@
 #include "uart.h"
 
 volatile int ADC_INTERRUPT_READY = 0;
+volatile int GAME_SCORE = 0;
 
 
 void INTERRUPT_init() {
@@ -64,10 +65,10 @@ ISR(INT1_vect) {
 	// Message recieved at recieve buffer 0
 	if (MCP_read(MCP_CANINTF) & MCP_RX0IF) {
 		struct CAN_message msg = CAN_message_recieve();
-		printf("--- Message recieved ---\n\r");
-		printf("ID: %#X \n\r", msg.id);
+		//printf("--- Message recieved ---\n\r");
+		//printf("ID: %#X \n\r", msg.id);
 		//printf("Length: %d \n\r", msg.length);
-		printf("Data[0] = %#X \n\r", msg.data[0]);
+		//printf("Data[0] = %#X \n\r", msg.data[0]);
 		
 		if (msg.id == 0x10){
 			volatile char str[8];
@@ -79,13 +80,25 @@ ISR(INT1_vect) {
 			OLED_print_string(str, 3*128 + 60);	//recieved updated score
 			OLED_refresh();
 		}
+		
+		if (msg.id == 0xFF){
+			TIMSK &= ~(1 << OCIE3A);
+			printf("GAME OVER\r\n");
+			OLED_clearAll();
+			volatile char str[8];
+			sprintf(str, "%d", GAME_SCORE);
+			OLED_print_string(str, 128 * 4 + 60);
+			OLED_print_string("GAME OVER", 128 * 2 + 30);
+			OLED_refresh();
+			while(1);
+		}
 	
 		// Reset receive flag
 		MCP_bitModify(MCP_CANINTF, MCP_RX0IF, 0);
 	}
 	
 	if (MCP_read(MCP_CANINTF) & MCP_MERRF) {
-		printf("CBE!");
+		printf("CBE EFLG = %d", MCP_EFLG);
 		//MCP_bitModify(MCP_CANINTF, MCP_MERRF, 0);
 	}
 
@@ -95,4 +108,12 @@ ISR(TIMER0_COMP_vect) {
 
 	send_joystick_pos();
 	// Timer is reset automatically
+}
+
+ISR(TIMER1_COMPA_vect){
+	GAME_SCORE += 1;
+	volatile char str[8];
+	sprintf(str, "%d", GAME_SCORE);
+	OLED_print_string(str, 3 * 128 + 60);
+	OLED_refresh();
 }

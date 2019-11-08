@@ -118,6 +118,7 @@ void MENU_playGame(void) {
 	msg.length = 1;
 	msg_ptr msgPtr = &msg;
 	CAN_message_send(msgPtr);
+	timer_1division256Init();
 	while (1) {
 		TIM8_WriteTCNT0(0);
 		send_slider_joystick_button();

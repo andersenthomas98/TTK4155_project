@@ -20,6 +20,17 @@ void timer_0division1024Init(void) {
 
 }
 
+void timer_1division256Init(void) {	//this is a 16-bit timer, when it reaches 19200 with this f/256 about a second has passed
+	
+	OCR1AH = 0x4B;	//OCR1A = 19200
+	OCR1AL = 0x00;
+	TIMSK |= (1 << OCIE1A);	//CTC mode resets the counter when it equals OCR1A
+	// start the timer
+	TCCR1B = 0b00001100;
+	// set prescaler to 256 (100), use CTC mode (WGM12 = 1) and start the timer
+	
+}
+
 void timer_2division1024Init(void) {
 
 	// start the timer

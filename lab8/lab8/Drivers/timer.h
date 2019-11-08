@@ -15,5 +15,11 @@ void timer_0division1024Init(void);
 void TIM8_WriteTCNT0(uint8_t i);
 unsigned int TIM8_ReadTCNT0(void);
 
+void timer_1division256Init(void);
+
+unsigned int TIM8_ReadTCNT2(void);
+
+void TIM8_WriteTCNT2(uint8_t i);
+
 
 #endif /* TIMER_H_ */

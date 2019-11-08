@@ -61,8 +61,8 @@ void send_joystick_pos(void) {
 	msg.length = 2;
 	msg_ptr msgPtr = &msg;
 	pos_t pos = joystick_pos();
-	uint8_t stdPosX = ((pos.x + 101) / 4) * 2; // Senker oppløsning for å unngå dirring ved å bruke heltalldivisjon
-	uint8_t stdPosY = ((pos.y + 101) / 4) * 2;
+	uint8_t stdPosX = ((pos.x + 101) / 5) * 2; // Senker oppløsning for å unngå dirring ved å bruke heltalldivisjon
+	uint8_t stdPosY = ((pos.y + 101) / 5) * 2;
 	msg.data[0] = stdPosX;
 	msg.data[1] = stdPosY;
 	CAN_message_send(msgPtr);
@@ -78,7 +78,7 @@ void send_slider_joystick_button(void) {
 	int8_t stdPosX = ((pos.x + 2) / 6) * 6;
 	msg.data[1] = (stdPosX+97)/2;
 	msg.data[2] = btn_right();
-	printf("btn_right = %d\n\r", msg.data[2]);
+	//printf("btn_right = %d\n\r", msg.data[2]);
 	CAN_message_send(msgPtr);
 }
 
@@ -93,4 +93,5 @@ int btn_left(void) {
 
 int btn_right(void) {
 	return (PINB & (1<<PB1));
+
 }
