@@ -3,7 +3,7 @@
  *
  * Created: 23.10.2019 10:19:40
  *  Author: thoander
- */ 
+ */
 
 
 #include <avr/io.h>
@@ -19,12 +19,12 @@
 #define F_CPU 16000000
 #include <util/delay.h>
 #include <avr/io.h>
-#include <avr/interrupt.h>
+//#include <avr/interrupt.h>
 #define MYUBRR 103
 
 int main(void)
 {
-	
+
 	UART_init(MYUBRR);
 	printf("Node 2 starting...\n\r");
 	INTERRUPT_init();

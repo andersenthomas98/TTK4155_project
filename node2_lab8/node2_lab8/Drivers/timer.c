@@ -16,12 +16,12 @@ void timer_0division1024Init(void) {
 
 
 }
-
+/*
 void timer_3division256Init(){
 	TCCR3B = 0b00000100;	//set prescalar to 256 (0b100)
 	TIMSK3 = 0b00000001;	//enable TOIE3, overflow interrupt
 }
-
+*/
 void TIM8_WriteTCNT0(uint8_t i)
 {
 	unsigned char sreg;

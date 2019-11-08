@@ -10,6 +10,7 @@
 #include "interrupt.h"
 #include "timer.h"
 #include "IR.h"
+#include "can.h"
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdint.h>
@@ -87,95 +88,115 @@ int16_t MOTOR_encoder_read(void) {
 	
 	// Get high byte
 	PORTH &= ~(1 << SEL);
+	_delay_us(100);	//denne må også være her hvis vi skal få bruke litt tid
 	
 	// Read high byte
 	uint8_t LSB = PINK;
 	//printf("LSB = %d\r\n", LSB);
 
-	_delay_ms(20); // DEN MÅ VÆRE HER!!!!
+	_delay_us(100); // DEN MÅ VÆRE HER!!!!
+	_delay_ms(10); //OBS slett denna?
 	
 	// Get LOW byte
 	PORTH |= (1 << SEL);
+	_delay_us(40);
 	
 	// Read low byte
 	uint8_t MSB = PINK;
 	//printf("MSB = %d, LSB = %d\r\n", MSB, LSB);
+	
 	
 	// Disable output of encoder
 	//PORTH |= (1 << _OE);
 	
 	int16_t encoder_value = (MSB << 8) | LSB;
 	
-	//printf("encoder value = %6d\r\n", encoder_value);
+	//printf("encoder value = %6d\r", encoder_value);
 	
 	return encoder_value;
 }
 
 void MOTOR_control() {
-	int last_error = 0;
-	float integral_error = 0;
-	float Kp = 0.035;
-	float Ki = 0.2;
-	float K_d = 0.025;
+	int integral_error = 0;
 	float T = 0.003;//0.01;
+	float T_i = 0.025;
+	float T_d = 0.006;
+	float Kp = 0.0325;	// Kpc = 0.05, Kp = 0.0325
+	float Ki = (Kp * T) / T_i;// ziegler nichols gives 0.0039
+	float K_d =(Kp * T_d) / T;//0.1; ziegler nichols gives 0.065
+	
+	int maxIntegral = (int)(55 / Ki);
+
 
 	int16_t output = 0;
 	int16_t error = 0;
 	int16_t value = MOTOR_encoder_read();
 	int16_t lastValue = value;
 	
-	MOTOR_set(0, 0);
-	
-	printf("waiting for game start\n\r");
-	while (!GAME_START); // Do nothing
-	printf("game starting\n\r");
-
-	//timer_3division256Init();	//start the score timer
+	msg_t msg;
+	msg.id = 0xFF;
+	msg.length = 1;
+	msg_ptr gameOverPtr = &msg;
 	
 	// Reset encoder value right after we start
 	PORTH &= ~(1 << _RST);
 	_delay_us(100);
 	PORTH |= (1 << _RST);
-
-	uint16_t reference = (255 - SLIDER_POS) * 35;
-	//printf("reference = %6d\r", reference);
-	while (1) {
-		TIM8_WriteTCNT0(0);
-		value = MOTOR_encoder_read();
-		reference = (255 - SLIDER_POS) * 35;	
-		error = reference - value;
-		if (error == 0){
-			integral_error = 0;
-		}
-		else{
-			integral_error += error;
-		}
-		output = (Kp * error) + (T * Ki * integral_error) - (K_d * (value - lastValue));
-		printf("reference=%4d,slider_pos=%3d, controller output=%4d\r", reference, SLIDER_POS, output);
-		//_delay_ms(200);
-		///*
-		if (abs(output) == output){
-			if (output > 255){
-				MOTOR_set(255, 0);
+	
+	while(1){
+		
+		GAME_OVER = 1;
+		MOTOR_set(0, 0);
+	
+		printf("waiting for game start\n\r");
+		while (!GAME_START); // Do nothing
+		printf("game starting\n\r");
+	
+		//timer_3division256Init();	//start the score timer
+	
+		uint16_t reference = (255 - SLIDER_POS) * 35;
+		//printf("reference = %6d\r", reference);
+		while (1) {
+			TIM8_WriteTCNT0(0);
+			int16_t lastValue = value;
+			value = MOTOR_encoder_read();
+			reference = (255 - SLIDER_POS) * 35;	
+			error = reference - value;
+			if (error < 80  && error > -80){
+				integral_error = 0;
+			}
+			else if (integral_error < maxIntegral && integral_error > -maxIntegral){
+				integral_error += error;
+			}
+			output = (Kp * error) + (Ki * integral_error) - (K_d * (value - lastValue));
+			//printf("reference=%4d,value=%5d,controller output=%4d,integral_error=%6d\r", reference, value, output, integral_error);
+			//_delay_ms(200);
+			///*
+			if (abs(output) == output){
+				if (output > 255){
+					MOTOR_set(255, 0);
+				}
+				else{
+					MOTOR_set(output, 0);				
+				}
 			}
 			else{
-				MOTOR_set(output, 0);				
+				if (output < (-255)){
+					MOTOR_set(255, 1);
+				}
+				else{
+					MOTOR_set(abs(output), 1);
+				}
 			}
-		}
-		else{
-			if (output < (-255)){
-				MOTOR_set(255, 1);
+			//*/
+			//printf("IR value = %4d\r", IR_read());
+			if (IR_read() < 100){
+				GAME_OVER = 1;
+				CAN_message_send(gameOverPtr);
+				while(1);
 			}
-			else{
-				MOTOR_set(abs(output), 1);
-			}
+			while(TIM8_ReadTCNT0() < 50);	//OBSOBS her 157 for å få ca T = 0.01
 		}
-		//*/
-		//printf("IR value = %4d\r", IR_read());
-		if (IR_read() < 100){
-			GAME_SCORE = 0;
-		}
-		while(TIM8_ReadTCNT0() < 50);	//OBSOBS her 157 for å få ca T = 0.01
 	}
 	
 }

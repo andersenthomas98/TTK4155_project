@@ -19,7 +19,7 @@
 volatile int ADC_INTERRUPT_READY = 0;
 volatile uint8_t SLIDER_POS;
 volatile int GAME_START = 0;
-volatile int GAME_SCORE = 0;
+volatile int GAME_OVER = 0;
 //volatile int SPI_TRANSMISSION_COMPLETE = 0;
 
 void INTERRUPT_init() {
@@ -34,13 +34,14 @@ void INTERRUPT_init() {
 	EIMSK |= (1 << INT2);
 		
 	// Enable global interrupts (set SREG register)
+	
 	sei();
 }
 
 
 // CAN interrupts
 ISR(INT2_vect) {
-	//printf("interrupt\n\r");
+	//printf("can interrupt");
 	if (MCP_read(MCP_CANINTF) & MCP_TX0IF) {
 		//printf("Message sendt succesfully\n\r");
 		
@@ -69,7 +70,7 @@ ISR(INT2_vect) {
 			SLIDER_POS = (int8_t)msg.data[0]; // Position of (right) slider
 			PWM_set_duty_cycle(msg.data[1]);  // Set servo position
 			if (msg.data[2] == 2) { // If button is pressed
-				printf("Trigger!\n\r");
+				//printf("Trigger!\n\r");
 				PORTL &= ~(1 << PL6);  // Trigger solenoid
 			}
 			else {
@@ -97,12 +98,3 @@ ISR(INT2_vect) {
 	} 
 }
 
-ISR(TIMER3_OVF_vect){
-	msg_t msg;
-	msg.id = 0x10;
-	msg.length = 1;
-	msg_ptr msgPtr = &msg;
-	msg.data[0] = GAME_SCORE;
-	CAN_message_send(msgPtr);
-	GAME_SCORE += 1;
-}
