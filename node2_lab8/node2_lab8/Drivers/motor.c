@@ -14,6 +14,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdint.h>
+#define F_CPU 16000000
 #include <avr/delay.h>
 #include <stdlib.h>
 
@@ -46,10 +47,7 @@ void MOTOR_init(void) {
 	PORTH |= (1 << _OE);
 	PORTH |= (1 << _RST);
 
-	// Reset encoder value
-	PORTH &= ~(1 << _RST);
-	_delay_us(100);
-	PORTH |= (1 << _RST);
+	MOTOR_reset_encoder();
 	
 	// Initialize PL6 as output to trigger the solenoid
 	DDRL |= (1 << PL6);
@@ -63,7 +61,13 @@ void MOTOR_DAC_write(uint8_t d) {
 	TWI_Start_Transceiver_With_Data(&msg, 3);
 }
 
-// Speed = [0, 255], dir = 0 / 1
+void MOTOR_reset_encoder(void) {
+	PORTH &= ~(1 << _RST);
+	_delay_us(100);
+	PORTH |= (1 << _RST);
+}
+
+// Speed = [0, 255], dir = (0 = left) / (1 = right)
 void MOTOR_set(uint8_t speed, int dir) {
 	// Enable motor
 	PORTH |= (1 << PH4);
@@ -88,22 +92,22 @@ int16_t MOTOR_encoder_read(void) {
 	
 	// Get high byte
 	PORTH &= ~(1 << SEL);
-	_delay_us(100);	//denne må også være her hvis vi skal få bruke litt tid
+	_delay_us(20);	//denne må også være her hvis vi skal få bruke litt tid
 	
 	// Read high byte
-	uint8_t LSB = PINK;
+	uint8_t MSB = PINK;
 	//printf("LSB = %d\r\n", LSB);
 
-	_delay_us(100); // DEN MÅ VÆRE HER!!!!
-	_delay_ms(10); //OBS slett denna?
+	//_delay_us(20); // DEN MÅ VÆRE HER!!!!
+	//_delay_ms(1); //OBS slett denna?
 	
 	// Get LOW byte
 	PORTH |= (1 << SEL);
-	_delay_us(40);
+	_delay_us(20);
 	
 	// Read low byte
-	uint8_t MSB = PINK;
-	//printf("MSB = %d, LSB = %d\r\n", MSB, LSB);
+	uint8_t LSB = PINK;
+	//printf("LSB = %d, MSB = %d\r\n", LSB, MSB);
 	
 	
 	// Disable output of encoder
@@ -116,16 +120,34 @@ int16_t MOTOR_encoder_read(void) {
 	return encoder_value;
 }
 
+void MOTOR_autocalibrate(void) {
+	printf("Calibrating\n\r");
+	MOTOR_set(90, 1);
+	int last_encoder_val = MOTOR_encoder_read();
+	int current_encoder_val = last_encoder_val;
+	_delay_ms(50);
+	do {
+		last_encoder_val = current_encoder_val;
+		current_encoder_val = MOTOR_encoder_read();
+		printf("change in encoder value = %6d\r", current_encoder_val - last_encoder_val);
+		_delay_ms(50);
+	}
+	while(current_encoder_val != last_encoder_val);
+	MOTOR_reset_encoder();
+	MOTOR_set(0, 1);
+	printf("\nFinished calibrating\n\r");
+}
+
 void MOTOR_control() {
 	int integral_error = 0;
 	float T = 0.003;//0.01;
 	float T_i = 0.025;
 	float T_d = 0.006;
-	float Kp = 0.0325;	// Kpc = 0.05, Kp = 0.0325
-	float Ki = (Kp * T) / T_i;// ziegler nichols gives 0.0039
-	float K_d =(Kp * T_d) / T;//0.1; ziegler nichols gives 0.065
+	float Kp = 0.0325 - 0.001;	// Kpc = 0.05, Kp = 0.0325
+	float Ki = (Kp * T) / T_i + 0.007;// ziegler nichols gives 0.0039
+	float K_d = (Kp * T_d) / T + 0.09;//0.1; ziegler nichols gives 0.065
 	
-	int maxIntegral = (int)(55 / Ki);
+	int maxIntegral = (int)(70 / Ki);
 
 
 	int16_t output = 0;
@@ -139,18 +161,11 @@ void MOTOR_control() {
 	msg_ptr gameOverPtr = &msg;
 	
 	// Reset encoder value right after we start
-	PORTH &= ~(1 << _RST);
-	_delay_us(100);
-	PORTH |= (1 << _RST);
+	MOTOR_autocalibrate();
 	
 	while(1){
 		
-		GAME_OVER = 1;
 		MOTOR_set(0, 0);
-	
-		printf("waiting for game start\n\r");
-		while (!GAME_START); // Do nothing
-		printf("game starting\n\r");
 	
 		//timer_3division256Init();	//start the score timer
 	
@@ -162,6 +177,8 @@ void MOTOR_control() {
 			value = MOTOR_encoder_read();
 			reference = (255 - SLIDER_POS) * 35;	
 			error = reference - value;
+
+			// Limit integral error to +- maxIntegral, and set integral error to zero when close enough to reference
 			if (error < 80  && error > -80){
 				integral_error = 0;
 			}
@@ -170,7 +187,8 @@ void MOTOR_control() {
 			}
 			output = (Kp * error) + (Ki * integral_error) - (K_d * (value - lastValue));
 			//printf("reference=%4d,value=%5d,controller output=%4d,integral_error=%6d\r", reference, value, output, integral_error);
-			//_delay_ms(200);
+
+			// Set correct direction whilst limiting the output of the controller
 			///*
 			if (abs(output) == output){
 				if (output > 255){
@@ -189,13 +207,18 @@ void MOTOR_control() {
 				}
 			}
 			//*/
-			//printf("IR value = %4d\r", IR_read());
-			if (IR_read() < 100){
-				GAME_OVER = 1;
+			
+			// Check for game over
+			//printf("IR=%5d\r", IR_read());
+			
+			if (IR_read() < 50){
 				CAN_message_send(gameOverPtr);
-				while(1);
+				GAME_START = 0;
+				return;
 			}
-			while(TIM8_ReadTCNT0() < 50);	//OBSOBS her 157 for å få ca T = 0.01
+			//printf("Timer value = %d\n\r", TIM8_ReadTCNT0());
+			while(TIM8_ReadTCNT0() < 50);	//Algorithm measured to take no longer than 162 counts (0.01s), we wait until 200 to give leeway for interrupts (0.0128)
+			
 		}
 	}
 	

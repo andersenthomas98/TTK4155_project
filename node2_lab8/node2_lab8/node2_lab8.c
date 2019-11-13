@@ -33,11 +33,12 @@ int main(void)
 	IR_init();
 	MOTOR_init();
 	timer_0division1024Init();
-	MOTOR_control();
 	
 	while (1) {
-		//MOTOR_control();
-		_delay_ms(50);
+		printf("waiting for game start\n\r");
+		while (!GAME_START); // Do nothing
+		printf("game starting\n\r");
+		MOTOR_control();
 	}
 
 }

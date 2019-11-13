@@ -19,7 +19,6 @@
 volatile int ADC_INTERRUPT_READY = 0;
 volatile uint8_t SLIDER_POS;
 volatile int GAME_START = 0;
-volatile int GAME_OVER = 0;
 //volatile int SPI_TRANSMISSION_COMPLETE = 0;
 
 void INTERRUPT_init() {
@@ -76,8 +75,6 @@ ISR(INT2_vect) {
 			else {
 				PORTL |= (1 << PL6);
 			}
-			
-			
 			
 		}
 		else if (msg.id == START_GAME){

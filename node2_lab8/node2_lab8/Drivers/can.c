@@ -24,7 +24,7 @@ void CAN_init(uint8_t mode) {
 	MCP_bitModify(MCP_CANCTRL, MODE_MASK, mode);	//enter specified mode
 	MCP_bitModify(MCP_RXB0CTRL, 0b01100000, 0b01100000); // Turn mask/filters off, recieve any message
 	
-	if (MCP_read(MCP_CANCTRL) & 0b01000000) {
+	if (MCP_read(MCP_CANCTRL) & MODE_LOOPBACK) {
 		printf("CAN controller in loopback mode\n\r");
 	}
 }
