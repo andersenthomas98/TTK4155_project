@@ -12,6 +12,7 @@
 
 volatile int ADC_INTERRUPT_READY = 0;
 volatile int GAME_SCORE = 0;
+volatile int GAME_OVER = 0;
 
 
 void INTERRUPT_init() {
@@ -82,15 +83,7 @@ ISR(INT1_vect) {
 		}
 		
 		if (msg.id == 0xFF){
-			TIMSK &= ~(1 << OCIE3A);
-			printf("GAME OVER\r\n");
-			OLED_clearAll();
-			volatile char str[8];
-			sprintf(str, "%d", GAME_SCORE);
-			OLED_print_string(str, 128 * 4 + 60);
-			OLED_print_string("GAME OVER", 128 * 2 + 30);
-			OLED_refresh();
-			while(1);
+			GAME_OVER = 1;
 		}
 	
 		// Reset receive flag
@@ -98,7 +91,7 @@ ISR(INT1_vect) {
 	}
 	
 	if (MCP_read(MCP_CANINTF) & MCP_MERRF) {
-		printf("CBE EFLG = %d", MCP_EFLG);
+		//printf("CBE EFLG = %d", MCP_EFLG);
 		//MCP_bitModify(MCP_CANINTF, MCP_MERRF, 0);
 	}
 

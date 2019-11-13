@@ -39,36 +39,8 @@ int main(void)
 	
 	MENU_start();
 	
-	
-/*
-	msg_t msg;
-	msg.id = 0x01;
-	msg.length = 1;
-	msg_ptr msgPtr = &msg;
-	
-	uint8_t joystickDirection;
-	
-	//CAN_message_send(msgPtr);
-	
-	while(1) {
-		// Testing CAN
-	
-		//send_joystick_dir();
-		printf("current timer value = %d \n\r", TIM8_ReadTCNT0());
-		//printf("interrupt flags: %#X \n\r", TIFR);
-		_delay_ms(4000);
-		
-	} 
-	
-	return 0;*/
-	
-	//pos_t pos = joystick_pos();
 	while(1){
-		//send_joystick_pos();
-// 		printf("joystickvalue y = %d \n\r", pos.y);
  		_delay_ms(500);
-// 		pos = joystick_pos();
-		//printf("iteration");
 	}
 	
 }

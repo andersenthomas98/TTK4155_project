@@ -28,7 +28,7 @@ void send_joystick_dir(void);
 
 void send_joystick_pos(void);
 
-void send_slider_joystick_button(void);
+void send_slider_joystick_button(uint8_t currentSliderValue, int currentJoystickValue, int currentButtonValue);
 
 void btn_init(void);
 

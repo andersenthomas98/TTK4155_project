@@ -12,6 +12,7 @@
 
 extern volatile int ADC_INTERRUPT_READY;
 extern volatile int GAME_SCORE;
+extern volatile int GAME_OVER;
 
 //extern volatile int SPI_TRANSMISSION_COMPLETE;
 

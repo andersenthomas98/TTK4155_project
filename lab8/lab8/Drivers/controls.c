@@ -68,16 +68,14 @@ void send_joystick_pos(void) {
 	CAN_message_send(msgPtr);
 }
 
-void send_slider_joystick_button(void) {
+void send_slider_joystick_button(uint8_t currentSliderValue, int currentJoystickValue, int currentButtonValue) {
 	msg_t msg;
 	msg.id = 0x03;
 	msg.length = 3;
 	msg_ptr msgPtr = &msg;
-	msg.data[0] = ADC_slider_right();
-	pos_t pos = joystick_pos();
-	int8_t stdPosX = ((pos.x + 2) / 6) * 6;
-	msg.data[1] = (stdPosX+97)/2;
-	msg.data[2] = btn_right();
+	msg.data[0] = currentSliderValue;
+	msg.data[1] = currentJoystickValue;
+	msg.data[2] = currentButtonValue;
 	//printf("btn_right = %d\n\r", msg.data[2]);
 	CAN_message_send(msgPtr);
 }

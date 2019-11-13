@@ -12,11 +12,17 @@
 #include "timer.h"
 #include "pong.h"
 #include "can.h"
+#include "interrupt.h"
+#include <avr/io.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <math.h>
 #define F_CPU 4915200
 #include <util/delay.h>
+
+int firstPlace = 0;
+int secondPlace = 0;
+int thirdPlace = 0;
 
 
 void MENU_print_children(menu_ptr item) {
@@ -53,18 +59,19 @@ void MENU_navigate(menu_ptr item) {
 						currentMenu->selectedChild -= 1;
 					}
 					break;
+				case LEFT:
+					if (currentMenu->parent != NULL){
+						currentMenu = currentMenu->parent;
+					}
+					break;
 				case RIGHT:
 					if (currentMenu->children[currentMenu->selectedChild]->num_children == 0){
 						OLED_clearAll();
 						currentMenu->children[currentMenu->selectedChild]->fun_ptr();
+						_delay_ms(50);
 					}
 					else{
 						currentMenu = currentMenu->children[currentMenu->selectedChild];
-					}
-					break;
-				case LEFT:
-					if (currentMenu->parent != NULL){
-						currentMenu = currentMenu->parent;
 					}
 					break;
 			}
@@ -83,10 +90,32 @@ void MENU_veryFunInvertingFunction(){
 		if (joystick_dir() == DOWN){
 			XMEM_write(0xA7, 0xA7);
 		}
+		else if (joystick_dir() == LEFT){
+			XMEM_write(0xA6, 0xA6);
+			return;
+		}
 		else{
 			XMEM_write(0xA6, 0xA6);
 		}
 	}
+}
+
+void MENU_localHighScores(){
+	OLED_clearAll();
+	OLED_print_string("HIGH SCORES", 16);
+	
+	volatile char str[8];
+	sprintf(str, "%d", firstPlace);
+	OLED_print_string(&str, 2 * 128);
+	sprintf(str, "%d", secondPlace);
+	OLED_print_string(&str, 3 * 128);
+	sprintf(str, "%d", thirdPlace);
+	OLED_print_string(&str, 4 * 128);
+	OLED_refresh();
+	
+	while(joystick_dir() != LEFT){
+	}
+	return;
 }
 
 void MENU_animation() {
@@ -110,22 +139,74 @@ void MENU_animation() {
 }
 
 void MENU_playGame(void) {
+	GAME_SCORE = 0;
+
+	uint8_t currentSliderValue = ADC_slider_right();
+	uint8_t lastSliderValue = currentSliderValue;
+
+	int currentButtonValue = btn_right();
+	int lastButtonValue = currentButtonValue;
+
+	int currentJoystickValue =  (ADC_read_x()*100/256);
+	int lastJoystickValue = currentJoystickValue;
+	
 	OLED_clearAll();
 	OLED_print_string("Playing game", 128*1 + 20);
 	OLED_refresh();
+	
 	msg_t msg;
 	msg.id = 0x04;
 	msg.length = 1;
 	msg_ptr msgPtr = &msg;
-	CAN_message_send(msgPtr);
-	timer_1division256Init();
-	while (1) {
+	CAN_message_send(msgPtr);	//tell the game to start
+	
+	timer_1division256Init(); //start our timer
+	while (GAME_OVER != 1) {
 		TIM8_WriteTCNT0(0);
-		send_slider_joystick_button();
-		// Update 24 times per second
+		
+		currentSliderValue = ADC_slider_right();
+
+		
+		currentJoystickValue =  (ADC_read_x()*100/256);
+
+		
+		currentButtonValue = btn_right();
+
+		if ((abs(currentSliderValue - lastSliderValue) > 1) || (abs(currentJoystickValue - lastJoystickValue) > 5) || (currentButtonValue != lastButtonValue)){	//only send new values
+			send_slider_joystick_button(currentSliderValue, currentJoystickValue, currentButtonValue);
+			lastSliderValue = currentSliderValue;
+			lastJoystickValue = currentJoystickValue;
+			lastButtonValue = currentButtonValue;
+		}
+		// Update up to 24 times per second
 		while (TIM8_ReadTCNT0() < 200);
 		//printf("iteration\r");
 	}
+
+	TIMSK &= ~(1 << OCIE1A);
+	printf("GAME OVER\r\n");
+	OLED_clearAll();
+	volatile char str[8];
+	sprintf(str, "%d", GAME_SCORE);
+	OLED_print_string(str, 128 * 4 + 60);
+	OLED_print_string("GAME OVER", 128 * 2 + 30);
+	OLED_refresh();
+	GAME_OVER = 0;
+
+	if (GAME_SCORE > firstPlace){
+		thirdPlace = secondPlace;
+		secondPlace = firstPlace;
+		firstPlace = GAME_SCORE;
+	}
+	else if (GAME_SCORE > secondPlace){
+		thirdPlace = secondPlace;
+		secondPlace = GAME_SCORE;
+	}
+	else if (GAME_SCORE > thirdPlace){
+		thirdPlace = GAME_SCORE;
+	}
+	_delay_ms(3000);
+	return;
 }
 
 
@@ -157,7 +238,8 @@ void MENU_start(void) {
 	menu_ptr sub_menu2Ptr = &sub_menu2;
 	sub_menu2.parent = mainMenuPtr;
 	sub_menu2.num_children = 0;
-	sub_menu2.name = "sub2";
+	sub_menu2.name = "High Scores";
+	sub_menu2.fun_ptr = &MENU_localHighScores;
 	
 	mainMenu.parent = NULL;
 	mainMenu.children[0] = sub_menu0Ptr;

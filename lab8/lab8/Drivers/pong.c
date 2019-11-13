@@ -28,6 +28,8 @@ void pong_fast() {
 
 	uint8_t leftPaddleX = 3;
 	uint8_t leftPaddleY = 31;
+	uint8_t leftPaddleYmeasCurrent = 128;
+	uint8_t leftPaddleYmeasLast = 128;
 	uint8_t lowerColLeftPaddle = 3 & 0x0F;	//left paddle
 	uint8_t upperColLeftPaddle = 3 >> 4;
 
@@ -57,7 +59,14 @@ void pong_fast() {
 			rightPaddleYmeasLast = rightPaddleYmeas;
 			rightPaddleYmeas = (ADC_slider_right()) / 4;
 			rightPaddleY = (rightPaddleYmeas + rightPaddleYmeasLast + rightPaddleYmeasLastLast)/3;	//example of a digital filter; note we use the last measurements, not the last values
-			leftPaddleY = (ADC_slider_left()) / 4;
+			
+			leftPaddleYmeasLast = leftPaddleYmeasCurrent;
+			leftPaddleYmeasCurrent = ADC_slider_left();
+			if (abs(leftPaddleYmeasCurrent - leftPaddleYmeasLast) > 3){	//samme som å bruke abs(diff) > 3 siden de er heltall
+				leftPaddleY = (leftPaddleYmeasCurrent) / 4;
+			}
+			
+			
 			xPrev = x;
 			yPrev = y;
 
@@ -166,9 +175,9 @@ void pong_slow() {
 	int leftPoints = 0;
 	float difference = 0;
 	while (1) {
-		float x = 63;
-		float y = 31;
-		x_vel = 1;
+		x = 63;
+		y = 31;
+		x_vel = 0.5;
 		y_vel = 0;
 		while (1){
 			TIM8_WriteTCNT0(0);
